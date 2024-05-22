@@ -1,0 +1,33 @@
+{
+  "tauri": {
+    "windows": [
+      {
+        "title": "Loading...",
+        "width": 280,
+        "height": 280,
+        "decorations": false,
+        "transparent": true,
+        "url": "../src/pages/splashscreen.html",
+        "label": "splashscreen",
+        "center": true,
+        "alwaysOnTop": true,
+        "resizable": false
+      },
+      {
+        "label": "main",
+        "fullscreen": false,
+        "resizable": true,
+        "title": "VEK Launcher",
+        "width": 860,
+        "height": 560,
+        "minWidth": 860,
+        "minHeight": 560,
+        "visible": false,
+        "center": true,
+        "decorations": false,
+        "transparent": true,
+        "url": "../src/pages/index.html"
+      }      
+    ]
+  }
+}
