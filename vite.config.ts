@@ -1,6 +1,7 @@
 import { defineConfig, UserConfigExport } from 'vite'
 import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
+import { fileURLToPath } from 'url';
 
 const config: UserConfigExport = async () => {
   return {
@@ -32,7 +33,8 @@ const config: UserConfigExport = async () => {
         '@store': resolve(__dirname, 'src/store'),
         '@styles': resolve(__dirname, 'src/styles'),
         '@fonts': resolve(__dirname, 'src/assets/fonts'),
-        '@utils': resolve(__dirname, 'src/utils')
+        '@utils': resolve(__dirname, 'src/utils'),
+        'webtorrent': fileURLToPath(new URL('./node_modules/webtorrent/dist/webtorrent.min.js', import.meta.url)),
       }
     }
   }

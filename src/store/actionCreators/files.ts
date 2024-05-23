@@ -1,6 +1,6 @@
 import {
   FetchFileFailure, FetchFileRequest, FetchFileSuccess, IFile,
-} from '@/types/file';
+} from '@/types/files';
 
 export const fetchFileRequest = (path: string): FetchFileRequest => ({
   type: 'FETCH_FILE',

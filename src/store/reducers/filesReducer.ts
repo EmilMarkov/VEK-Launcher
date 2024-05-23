@@ -1,4 +1,4 @@
-import { IFileReducerState } from '@/types/file';
+import { IFileReducerState } from '@/types/files';
 import { Actions } from '@/types/store';
 
 const initialState: IFileReducerState = {

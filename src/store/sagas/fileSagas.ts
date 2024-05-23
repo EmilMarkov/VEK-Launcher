@@ -3,8 +3,8 @@ import {
 } from 'redux-saga/effects';
 
 import * as fileService from '@services/fileService'
-import { fetchFileSuccess, fetchFileFailure } from '@store/actionCreators/fileActionCreators';
-import { FETCH_FILE, IFile } from '@/types/file';
+import { fetchFileSuccess, fetchFileFailure } from '@/store/actionCreators/files';
+import { FETCH_FILE, IFile } from '@/types/files';
 
 function* fetchFileSaga(action: any) {
   try {
