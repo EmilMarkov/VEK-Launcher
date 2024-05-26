@@ -1,27 +1,24 @@
-import React from 'react'
-import { ClearText, Container, Input, InputIcon, Props } from './styled'
-import { SvgIconClose } from '@components/UIElements/Icons/SvgIcon'
+import React, { ForwardRefRenderFunction } from 'react';
+import { ClearText, Container, Input, InputIcon, Props } from './styled';
+import { SvgIconClose } from '@components/UIElements/Icons/SvgIcon';
 
-const InputText: React.FC<Props> = React.forwardRef((props ,ref)=> {
-    // Clear InputText
-    const clearText = ()=>{
-        if(props.setValue) props.setValue('')
+const InputText: ForwardRefRenderFunction<HTMLInputElement, Props> = (props, ref) => {
+    const clearText = () => {
+        if (props.setValue) props.setValue('');
+    };
+
+    let leftIcon: any;
+    if (props.enableLeftIcon) {
+        leftIcon = <InputIcon>{props.leftIcon}</InputIcon>;
     }
 
-    // Left Icon
-    let leftIcon: any
-    if(props.enableLeftIcon){
-        leftIcon = <InputIcon>{props.leftIcon}</InputIcon>
-    }
-    
-    // Clear Button
-    let clearBtn: any
-    if(props.enableClearTextBtn){
-        clearBtn = <ClearText onClick={clearText}><SvgIconClose size='16' /></ClearText>
+    let clearBtn: any;
+    if (props.enableClearTextBtn) {
+        clearBtn = <ClearText onClick={clearText}><SvgIconClose size='16' /></ClearText>;
     }
 
-    return(
-        <Container 
+    return (
+        <Container
             id="input-text-container"
             value={props.value}
             borderRadius={props.borderRadius}
@@ -41,7 +38,7 @@ const InputText: React.FC<Props> = React.forwardRef((props ,ref)=> {
                     const { value, maxLength } = e.target;
                     const message = value.slice(0, maxLength);
                     maxLength > 0 ? (props.setValue ? props.setValue(message) : null) :
-                    (props.setValue ? props.setValue(e.target.value) : null)
+                        (props.setValue ? props.setValue(e.target.value) : null)
                 }}
                 required={props.required}
                 enableClearTextBtn={props.enableClearTextBtn}
@@ -54,7 +51,7 @@ const InputText: React.FC<Props> = React.forwardRef((props ,ref)=> {
             {clearBtn}
             {leftIcon}
         </Container>
-    )    
-})
+    );
+}
 
-export default InputText
+export default React.forwardRef(InputText);

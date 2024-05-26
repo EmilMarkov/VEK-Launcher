@@ -3,12 +3,9 @@ import { Container, Props } from './styles'
 import { Settings } from '@/Settings'
 
 import { SvgIconLogo } from '@components/UIElements/Icons/SvgIcon'
-import store from '@/store'
 
 const AboutPage: React.FC<Props> = ({pageName, visible})=>{
     const svgIconLogo = <SvgIconLogo size='120px' />
-
-    console.log(store.getState())
 
     return(
         <Container className={`app-container-column ${visible ? "" : "hide-page"}`}>            

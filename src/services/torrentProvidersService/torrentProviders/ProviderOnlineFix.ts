@@ -1,13 +1,13 @@
-// import { ITorrent } from '@/types/torrents';
-// import { BaseTorrentProvider } from '../BaseTorrentProvider';
-// import { JSDOM } from 'jsdom';
+import { JSDOM } from 'jsdom';
+import {requestWebPage} from "@services/torrentProvidersService/helpers";
 
-// export class ProviderOnlineFix extends BaseTorrentProvider {
-//   async request(path: string): Promise<any> {
-//     return this.requestWebPage(`https://online-fix.me${path}`);
-//   }
+export class ProviderOnlineFix {
+  async request(path: string): Promise<any> {
+    return requestWebPage(`https://online-fix.me${path}`);
+  }
 
-//   async getTorrents(query: string): Promise<ITorrent[]> {
-    
-//   }
-// }
+  async getTorrents(existingTorrents: string[] = [], page = 1): Promise<string[]> {
+    const torrents: string[] = [];
+    return torrents;
+  }
+}

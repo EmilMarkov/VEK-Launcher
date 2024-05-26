@@ -21,9 +21,10 @@ const Modals: React.FC<Props> = ({ setModal, closeModal, data }) => {
 
     var modal = null;
     switch (setModal) {
-        // case 'name':
-        //     modal = <NameModal data={data} />;
-        //     break;
+        case 'name':
+            const a = data;
+            //modal = <NameModal data={data} />;
+            break;
         default:
             modal = null;
     }

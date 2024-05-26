@@ -1,3 +1,3 @@
-// export interface PropName {
-//     name: string;
-// }
+export interface PropName {
+    name: string;
+}

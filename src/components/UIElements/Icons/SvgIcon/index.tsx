@@ -107,15 +107,15 @@ export const SvgIconHome: React.FC<Props> = ({size, color})=>{
     if(color) iconColor = color
 
     return(
-        <svg viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" fill={iconColor}>
-            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+        <svg viewBox="0 0 24 24" version="1.1" width={size} height={size} xmlns="http://www.w3.org/2000/svg" fill={iconColor}>
+            <g id="SVGRepo_bgCarrier"></g>
+            <g id="SVGRepo_tracerCarrier"></g>
             <g id="SVGRepo_iconCarrier">
-                <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <g id="Page-1" stroke="none" fill="none">
                     <g id="Home">
-                        <rect id="Rectangle" fill-rule="nonzero" width={size} height={size}></rect>
-                        <path d="M5,10 L5,19 C5,19.5523 5.44772,20 6,20 L18,20 C18.5523,20 19,19.5523 19,19 L19,10" id="Path" stroke={iconColor} stroke-width="2" stroke-linecap="round"></path>
-                        <path d="M21,11 L12.307,4.23875 C12.1264,4.09832 11.8736,4.09832 11.693,4.23875 L3,11" id="Path" stroke={iconColor} stroke-width="2" stroke-linecap="round"></path>
+                        <rect id="Rectangle" width={size} height={size}></rect>
+                        <path d="M5,10 L5,19 C5,19.5523 5.44772,20 6,20 L18,20 C18.5523,20 19,19.5523 19,19 L19,10" id="Path" stroke={iconColor}></path>
+                        <path d="M21,11 L12.307,4.23875 C12.1264,4.09832 11.8736,4.09832 11.693,4.23875 L3,11" id="Path" stroke={iconColor}></path>
                     </g>
                 </g>
             </g>
@@ -192,7 +192,7 @@ export const SvgIconNotification: React.FC<Props> = ({size, color})=>{
 
     return(
         <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill={iconColor} viewBox="0 0 16 21">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 3.464V1.1m0 2.365a5.338 5.338 0 0 1 5.133 5.368v1.8c0 2.386 1.867 2.982 1.867 4.175C15 15.4 15 16 14.462 16H1.538C1 16 1 15.4 1 14.807c0-1.193 1.867-1.789 1.867-4.175v-1.8A5.338 5.338 0 0 1 8 3.464ZM4.54 16a3.48 3.48 0 0 0 6.92 0H4.54Z"/>
+            <path stroke="currentColor" d="M8 3.464V1.1m0 2.365a5.338 5.338 0 0 1 5.133 5.368v1.8c0 2.386 1.867 2.982 1.867 4.175C15 15.4 15 16 14.462 16H1.538C1 16 1 15.4 1 14.807c0-1.193 1.867-1.789 1.867-4.175v-1.8A5.338 5.338 0 0 1 8 3.464ZM4.54 16a3.48 3.48 0 0 0 6.92 0H4.54Z"/>
         </svg>
     )
 }
@@ -229,7 +229,7 @@ export const SvgIconUp: React.FC<Props> = ({size, color})=>{
 
     return(
         <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill={iconColor} viewBox="0 0 10 14">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13V1m0 0L1 5m4-4 4 4"/>
+            <path stroke="currentColor" d="M5 13V1m0 0L1 5m4-4 4 4"/>
         </svg>
     )
 }
@@ -241,10 +241,10 @@ export const SvgIconCatalog: React.FC<Props> = ({size, color})=>{
 
     return(
         <svg viewBox="0 0 24 24" width={size} height={size} fill={iconColor} xmlns="http://www.w3.org/2000/svg">
-            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+            <g id="SVGRepo_bgCarrier"></g>
+            <g id="SVGRepo_tracerCarrier"></g>
             <g id="SVGRepo_iconCarrier">
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M8.4 3h11.2A2.4 2.4 0 0 1 22 5.4v11.2a2.4 2.4 0 0 1-2.4 2.4H8.4A2.4 2.4 0 0 1 6 16.6V5.4A2.4 2.4 0 0 1 8.4 3ZM14 6a1 1 0 0 1 1 1v3h3a1 1 0 1 1 0 2h-3v3a1 1 0 1 1-2 0v-3h-3a1 1 0 1 1 0-2h3V7a1 1 0 0 1 1-1Z" fill={iconColor}></path>
+                <path d="M8.4 3h11.2A2.4 2.4 0 0 1 22 5.4v11.2a2.4 2.4 0 0 1-2.4 2.4H8.4A2.4 2.4 0 0 1 6 16.6V5.4A2.4 2.4 0 0 1 8.4 3ZM14 6a1 1 0 0 1 1 1v3h3a1 1 0 1 1 0 2h-3v3a1 1 0 1 1-2 0v-3h-3a1 1 0 1 1 0-2h3V7a1 1 0 0 1 1-1Z" fill={iconColor}></path>
                 <path d="M4 5a1 1 0 0 0-2 0v11.6C2 20.132 4.868 23 8.4 23H20a1 1 0 1 0 0-2H8.4A4.403 4.403 0 0 1 4 16.6V5Z" fill={iconColor}></path>
             </g>
         </svg>
@@ -258,10 +258,10 @@ export const SvgIconLibrary: React.FC<Props> = ({size, color})=>{
 
     return(
         <svg viewBox="0 0 24 24" width={size} height={size} fill={iconColor} xmlns="http://www.w3.org/2000/svg">
-            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+            <g id="SVGRepo_bgCarrier"></g>
+            <g id="SVGRepo_tracerCarrier"></g>
             <g id="SVGRepo_iconCarrier">
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M19.6 3H8.4A2.4 2.4 0 0 0 6 5.4v11.2A2.4 2.4 0 0 0 8.4 19h11.2a2.4 2.4 0 0 0 2.4-2.4V5.4A2.4 2.4 0 0 0 19.6 3ZM9 8a1 1 0 0 1 1-1h8a1 1 0 1 1 0 2h-8a1 1 0 0 1-1-1Zm1 2a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2h-8Zm-1 4a1 1 0 0 1 1-1h4a1 1 0 1 1 0 2h-4a1 1 0 0 1-1-1Z" fill={iconColor}></path>
+                <path d="M19.6 3H8.4A2.4 2.4 0 0 0 6 5.4v11.2A2.4 2.4 0 0 0 8.4 19h11.2a2.4 2.4 0 0 0 2.4-2.4V5.4A2.4 2.4 0 0 0 19.6 3ZM9 8a1 1 0 0 1 1-1h8a1 1 0 1 1 0 2h-8a1 1 0 0 1-1-1Zm1 2a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2h-8Zm-1 4a1 1 0 0 1 1-1h4a1 1 0 1 1 0 2h-4a1 1 0 0 1-1-1Z" fill={iconColor}></path>
                 <path d="M4 5a1 1 0 0 0-2 0v11.6C2 20.132 4.868 23 8.4 23H20a1 1 0 1 0 0-2H8.4A4.403 4.403 0 0 1 4 16.6V5Z" fill={iconColor}></path>
             </g>
         </svg>

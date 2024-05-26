@@ -1,16 +1,15 @@
-import { ITorrent } from '@/types/torrents';
-import { BaseTorrentProvider } from '../BaseTorrentProvider';
 import { JSDOM, VirtualConsole } from 'jsdom';
+import { requestWebPage, saveTorrent } from '../helpers';
 
 const virtualConsole = new VirtualConsole();
 
-export class ProviderGOG extends BaseTorrentProvider {
+export class ProviderGOG {
   async request(path: string): Promise<any> {
-    return this.requestWebPage(`https://freegogpcgames.com${path}`);
+    return requestWebPage(`https://freegogpcgames.com${path}`);
   }
 
-  async getTorrents(): Promise<ITorrent[]> {
-    const torrents: ITorrent[] = [];
+  async getTorrents(): Promise<string[]> {
+    const torrents: string[] = [];
     const data = await this.request('/a-z-games-list/');
     const { window } = new JSDOM(data, { virtualConsole });
     const $uls = Array.from(window.document.querySelectorAll(".az-columns"));
@@ -25,37 +24,12 @@ export class ProviderGOG extends BaseTorrentProvider {
 
         const torrentExists = true;
 
-        if (!torrentExists) {
-          const id: Number = GameService.getGameId(title);
-          const magnetUrl = await this.getMagnet(href);
 
-          if (id && magnetUrl) {
-            const torrent: ITorrent = {
-              id: id,
-              title: title,
-              link: magnetUrl
-            }
-  
-            torrents.push(torrent);
-          }
-        }
       }
     }
 
     return torrents;
   }
-
-  getUploadDate(document: Document) {
-    const $modifiedTime = document.querySelector(
-      '[property="article:modified_time"]'
-    ) as HTMLMetaElement;
-    if ($modifiedTime) return $modifiedTime.content;
-  
-    const $publishedTime = document.querySelector(
-      '[property="article:published_time"]'
-    ) as HTMLMetaElement;
-    return $publishedTime.content;
-  };
 
   getDownloadLink(document: Document) {
     const $latestDownloadButton = document.querySelector(
@@ -72,7 +46,7 @@ export class ProviderGOG extends BaseTorrentProvider {
   };
 
   async getMagnet(url: string) {
-    const data = await this.requestWebPage(url);
+    const data = await requestWebPage(url);
     const { window } = new JSDOM(data, { virtualConsole });
   
     const downloadLink = this.getDownloadLink(window.document);

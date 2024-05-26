@@ -1,45 +1,53 @@
-import axios from "axios";
-import UserAgent from "user-agents";
+import { invoke } from '@tauri-apps/api/tauri';
+import {
+  removeReleaseYearFromName,
+  removeSymbolsFromName,
+  removeSpecialEditionFromName,
+  empressFormatter,
+  kaosKrewFormatter,
+  fitGirlFormatter,
+  removeDuplicateSpaces,
+  dodiFormatter,
+  removeTrash,
+  xatabFormatter,
+  tinyRepacksFormatter,
+  gogFormatter,
+  onlinefixFormatter,
+} from "./formatters";
 
-import store from "@store";
-import { fetchTorrentsRequest } from "@/store/actionCreators/torrents";
+export const pipe =
+    <T>(...fns: ((arg: T) => any)[]) =>
+        (arg: T) =>
+            fns.reduce((prev, fn) => fn(prev), arg);
 
-import { useDispatch, useSelector } from "react-redux";
+export const formatName = pipe<string>(
+    removeTrash,
+    removeReleaseYearFromName,
+    removeSymbolsFromName,
+    removeSpecialEditionFromName,
+    removeDuplicateSpaces,
+    (str) => str.trim()
+);
 
-export const saveTorrent = async () => {
-  const dispatch = useDispatch()
-  dispatch(fetchTorrentsRequest())
+export const getFileBuffer = async (url: string): Promise<Uint8Array> => {
+  try {
+    const arrayBuffer: ArrayBuffer = await invoke('fetch_file_buffer', { url });
+    return new Uint8Array(arrayBuffer);
+  } catch (error) {
+    console.error('Error fetching file buffer:', error);
+    throw error; // Проброс исключения для обработки на более высоком уровне
+  }
 }
 
-export const requestWebPage = async (url: string) => {
-  const userAgent = new UserAgent();
 
-  return axios
-    .get(url, {
-      headers: {
-        "User-Agent": userAgent.toString(),
-      },
-    })
-    .then((response) => response.data);
+export const saveTorrent = (link: string, title: string) => {
+}
+
+export const requestWebPage = async (url: string): Promise<string> => {
+  try {
+    return await invoke<string>('fetch_web_content', { url });
+  } catch (error) {
+    console.error(`Ошибка при получении контента с ${url}:`, error);
+    return "";
+  }
 };
-
-export const decodeNonUtf8Response = async (res: Response) => {
-  const contentType = res.headers.get("content-type");
-  if (!contentType) return res.text();
-
-  const charset = contentType.substring(contentType.indexOf("charset=") + 8);
-
-  const text = await res.arrayBuffer().then((ab) => {
-    const dataView = new DataView(ab);
-    const decoder = new TextDecoder(charset);
-
-    return decoder.decode(dataView);
-  });
-
-  return text;
-};
-
-export const getFileBuffer = async (url: string) =>
-  fetch(url, { method: "GET" }).then((response) =>
-    response.arrayBuffer().then((buffer) => Buffer.from(buffer))
-  );

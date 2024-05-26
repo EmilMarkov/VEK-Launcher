@@ -3,12 +3,13 @@ import styled, { DefaultTheme } from 'styled-components';
 export interface Props {
   setModal?: string | null;
   closeModal: () => void;
+  data: string;
 }
 
-export const modelStyles = (theme: DefaultTheme) => {
+export const modelStyles = (theme: DefaultTheme | undefined) => {
   return {
     overlay: {
-      backgroundColor: theme.colors.background_modal,
+      backgroundColor: theme?.colors.background_modal,
     },
     content: {
       padding: '10px',
@@ -18,9 +19,9 @@ export const modelStyles = (theme: DefaultTheme) => {
       gap: '10px',
       flex: '1',
       flexBasis: '100px',
-      border: '4px solid ' + theme.colors.background_4,
+      border: '4px solid ' + theme?.colors.background_4,
       borderRadius: '10px',
-      backgroundColor: theme.colors.background,
+      backgroundColor: theme?.colors.background,
       overflow: 'hidden',
     },
   };

@@ -1,11 +1,16 @@
 import { defineConfig, UserConfigExport } from 'vite'
 import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
-import { fileURLToPath } from 'url';
+import nodePolyfills from 'rollup-plugin-polyfill-node';
+import reactWorker from "vite-plugin-react-worker";
 
 const config: UserConfigExport = async () => {
   return {
-    plugins: [react()],
+    plugins: [
+      react(),
+      nodePolyfills(),
+      reactWorker(),
+    ],
     clearScreen: false,
     server: {
       port: 1420,
@@ -34,7 +39,8 @@ const config: UserConfigExport = async () => {
         '@styles': resolve(__dirname, 'src/styles'),
         '@fonts': resolve(__dirname, 'src/assets/fonts'),
         '@utils': resolve(__dirname, 'src/utils'),
-        'webtorrent': fileURLToPath(new URL('./node_modules/webtorrent/dist/webtorrent.min.js', import.meta.url)),
+        'webtorrent': resolve(__dirname, 'node_modules/webtorrent/dist/webtorrent.min.js'),
+        'events': 'events',
       }
     }
   }
