@@ -1,7 +1,5 @@
 // Import Assets
 import Logo from '@assets/app_logo.png'
-import LogoDark from '@assets/app_logo_dark.png'
-import { SvgIconLogo } from '@components/UIElements/Icons/SvgIcon'
 
 // Default Theme
 import dark from '@styles/themes/dark'
@@ -25,14 +23,6 @@ export class Settings {
     static appDeveloperEmail: string = 'mail@markov-emil.ru'
     /** Add a logo to your application, PNG or SVG. */
     static appLogo: string = Logo
-    /** Add a dark logo to your application, PNG or SVG. */
-    static appLogoDark: string = LogoDark
-    /** Set logo size based on height */
-    static appLogoHeight: string = '32'
-    /** Set title bar icon size */
-    static appTitleBarIconSize: string = '16'
-    /** Add a title bar icon */
-    static appTitleBarIcon: any = <SvgIconLogo size={this.appTitleBarIconSize}/>
 
     // Left Menu
     /** Left menu toggle button icon size */

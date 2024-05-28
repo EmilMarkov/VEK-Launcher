@@ -1,5 +1,6 @@
 import TorrentParserWorker from './torrent-parser.worker.js?worker';
-import { gameService, IGame } from '@services/gameService/gameService';
+import { gameService } from '@services/gameService/gameService';
+import {IGame} from "@/types";
 import { toMagnetURI } from 'parse-torrent';
 import { Semaphore } from 'async-mutex';  // Импортируем Semaphore из async-mutex
 

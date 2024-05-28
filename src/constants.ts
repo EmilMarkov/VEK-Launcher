@@ -1,5 +1,4 @@
 import path from "path";
-import { appDataDir } from '@tauri-apps/api/path';
 import { Settings } from "./Settings";
 import os from "os";
 
@@ -13,12 +12,10 @@ if (os.platform() === "win32") {
     appDataDirectory = path.join(os.homedir(), ".config");
 }
 
-// const databasePath = path.join(
-//     appDataDirectory,
-//     Settings.appName,
-//     Settings.appName.toLowerCase().replace(/\s+/g, '') + ".db"
-// );
-
-const databasePath = "./veklauncher.db";
+const databasePath = path.join(
+    appDataDirectory,
+    Settings.appName,
+    Settings.appName.toLowerCase().replace(/\s+/g, '') + ".sqlite"
+);
 
 export { databasePath };

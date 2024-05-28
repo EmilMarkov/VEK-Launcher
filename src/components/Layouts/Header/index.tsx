@@ -24,7 +24,6 @@ import {
 
 const Header: React.FC<Props> = ({
     focus,
-    titleBarIcon,
     isAppMaximized, 
     setTheme, 
     appName,
@@ -97,13 +96,11 @@ const Header: React.FC<Props> = ({
     return(
         <Content
           focus={focus}
-          titleBarIcon={titleBarIcon} 
           data-tauri-drag-region
           className='header'
         >
           <div className='title-bar'>
             <div data-tauri-drag-region className='icon-title'>
-              {titleBarIcon}
               <h1 data-tauri-drag-region>{appName?.toUpperCase()}</h1>
             </div>
             <div className='buttons'>

@@ -3,8 +3,8 @@
     "windows": [
       {
         "title": "Loading...",
-        "width": 280,
-        "height": 280,
+        "width": 560,
+        "height": 315,
         "decorations": false,
         "transparent": true,
         "url": "../src/pages/splashscreen.html",
@@ -26,7 +26,8 @@
         "visible": false,
         "center": true,
         "decorations": false,
-        "transparent": true
+        "transparent": true,
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"
       }      
     ]
   }

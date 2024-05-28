@@ -2,7 +2,6 @@ import styled from 'styled-components'
 
 export interface Props {
     focus?: boolean
-    titleBarIcon: any
     isAppMaximized?: boolean
     setTheme?: any
     appName?: string
@@ -48,6 +47,7 @@ export const Content = styled.header<Props>`
         align-items: center;
         flex: 1;
         padding-top: 2px;
+        padding-left: 10px;
         White-space: nowrap;
         overflow: hidden;
     }

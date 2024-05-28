@@ -6,9 +6,10 @@ import usePersistedState from '@utils/userPersistedState'
 import { invoke } from '@tauri-apps/api';
 import { Settings } from '@/Settings';
 import { appWindow } from '@tauri-apps/api/window';
-import CircularProgressBar from '@components/Misc/CircularProgressBar';
 import { type } from '@tauri-apps/api/os';
 import light from '@styles/themes/light'
+import { BarLoader } from 'react-spinners';
+
 const osType = await type()
 
 function SplashScreen() {
@@ -18,9 +19,8 @@ function SplashScreen() {
     const [appLeftMenuLogo, setAppLeftMenuLogo] = useState(Settings.appLogo)
 
     useEffect(()=>{
-        changeLogo() 
         if(percentage < 100){
-            const timer = setInterval(()=>{        
+            const timer = setInterval(()=>{
                 setPercentage(Math.trunc(percentage + Settings.splashScreenUpdateSteps))
             }, Settings.splashScreenUpdateMilliseconds)
             return () => clearInterval(timer)
@@ -38,16 +38,9 @@ function SplashScreen() {
     // Update theme when user changes in OS
     appWindow.onThemeChanged(() => {
         appWindow.theme().then(theme => {
-        theme == 'dark' ? setTheme(dark) : setTheme(light)
+            theme == 'dark' ? setTheme(dark) : setTheme(light)
         })
     })
-    // Change logo when change theme and load
-    function changeLogo() {
-        theme.title == dark.title ?
-        setAppLeftMenuLogo(Settings.appLogo) :
-        setAppLeftMenuLogo(Settings.appLogoDark)
-        console.log("entrou splash")
-    }
 
     // Prevent context menu and shortcuts
     function disable_web_functions() {
@@ -79,29 +72,20 @@ function SplashScreen() {
 
     return(
         <ThemeProvider theme={theme}>
-            <GlobalStyle /> 
+            <GlobalStyle />
 
             <div data-tauri-drag-region className='preloader-app'>
-                <CircularProgressBar
-                    data-tauri-drag-region
-                    value={percentage}
-                    textSuffix='%'
-                    viewBoxSize={230}
-                    strokeColor={theme.colors.accentColor}
-                    strokeWidth={Settings.splashScreenStrokeWidth}
-                    bgStrokeWidth={Settings.splashScreenBgStrokeWidth}
-                    bgStrokeColor={theme.colors.background_5+'80'}
-                    dropShadow='0 0 5px #33333380'
-                >
-                    <div data-tauri-drag-region className='content'>
-                        <img data-tauri-drag-region src={appLeftMenuLogo} height={30} />
-                        <div data-tauri-drag-region className='percentage'>{percentage}%</div>
-                        <div data-tauri-drag-region className='version'>{Settings.appVersion}</div>
-                        <div data-tauri-drag-region className='loading-text'>{Settings.splashScreenLoadingText}</div>
+                <div data-tauri-drag-region className='content'>
+                    <img data-tauri-drag-region className='logo' src={appLeftMenuLogo} height={120} />
+                    <div data-tauri-drag-region className='app-name'>{Settings.appName}</div>
+                    <div data-tauri-drag-region className='percentage'>{percentage}%</div>
+                    <div data-tauri-drag-region className='loader-wrapper'>
+                        <BarLoader color={theme.colors.color_1} width={'100%'} height={4} />
                     </div>
-                </CircularProgressBar>
+                    <div data-tauri-drag-region className='version'>{Settings.appVersion}</div>
+                </div>
             </div>
-        </ThemeProvider>        
+        </ThemeProvider>
     )
 }
 

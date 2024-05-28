@@ -209,19 +209,6 @@ export const SvgIconFolder: React.FC<Props> = ({size, color})=>{
     )
 }
 
-export const SvgIconLogo: React.FC<Props> = ({size, color})=>{
-    const { colors } = useContext(ThemeContext)
-    var iconColor = colors.appIconColor
-    if(color) iconColor = color
-
-    return(
-        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill={iconColor} viewBox="0 0 16 20">
-            <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.98 2.98 0 0 0 .13 5H5Z"/>
-            <path d="M14.066 0H7v5a2 2 0 0 1-2 2H0v11a1.97 1.97 0 0 0 1.934 2h12.132A1.97 1.97 0 0 0 16 18V2a1.97 1.97 0 0 0-1.934-2ZM12 6h-2v2h2v2h-2v2h2v2h-2v2h2v2h-2v-2H8v-2h2v-2H8v-2h2V8H8V6h2V4H8V2h2v2h2v2Z"/>
-        </svg>
-    )
-}
-
 export const SvgIconUp: React.FC<Props> = ({size, color})=>{
     const { colors } = useContext(ThemeContext)
     var iconColor = colors.appIconColor
@@ -288,7 +275,6 @@ export default {
         SvgIconReload,
         SvgIconNotification,
         SvgIconFolder,
-        SvgIconLogo,
         SvgIconUp,
         SvgIconCatalog,
         SvgIconLibrary

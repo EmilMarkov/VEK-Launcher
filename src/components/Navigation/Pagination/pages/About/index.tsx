@@ -2,17 +2,12 @@ import React from 'react'
 import { Container, Props } from './styles'
 import { Settings } from '@/Settings'
 
-import { SvgIconLogo } from '@components/UIElements/Icons/SvgIcon'
-
 const AboutPage: React.FC<Props> = ({pageName, visible})=>{
-    const svgIconLogo = <SvgIconLogo size='120px' />
-
     return(
         <Container className={`app-container-column ${visible ? "" : "hide-page"}`}>            
             <section className="app-section flex-1">
                 <div className="content box-time flex-column">
                     <div className='column app-image'>
-                        {svgIconLogo}
                         <div className='app-name'>{Settings.appName}</div>
                     </div>
                     <div className='row app-info-box'>
