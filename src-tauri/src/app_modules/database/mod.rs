@@ -14,9 +14,7 @@ impl Database {
                 match connection.execute(
                     "CREATE TABLE IF NOT EXISTS games (
                     id TEXT PRIMARY KEY,
-                    title TEXT NOT NULL,
-                    description TEXT,
-                    screenshots TEXT,
+                    name TEXT NOT NULL,
                     torrents TEXT
                 )",
                     [],
@@ -31,17 +29,14 @@ impl Database {
 
     pub fn add_game(
         &self,
-        title: &str,
-        description: Option<&str>,
-        screenshots: Option<&[String]>,
+        name: &str,
         torrents: Option<&[String]>,
     ) -> Result<(), Error> {
         let id = Uuid::new_v4().to_string();
-        let screenshots_str = screenshots.map(|s| s.join(","));
         let torrents_str = torrents.map(|t| t.join(","));
         self.connection.execute(
-            "INSERT INTO games (id, title, description, screenshots, torrents) VALUES (?1, ?2, ?3, ?4, ?5)",
-            params![&id, title, description, screenshots_str, torrents_str],
+            "INSERT INTO games (id, title, torrents) VALUES (?1, ?2, ?3)",
+            params![&id, name, torrents_str],
         )?;
         Ok(())
     }
@@ -52,10 +47,8 @@ impl Database {
         if let Some(row) = rows.next()? {
             Ok(Some(Game {
                 id: row.get(0)?,
-                title: row.get(1)?,
-                description: row.get(2)?,
-                screenshots: row.get::<_, Option<String>>(3)?.map(|s| s.split(',').map(String::from).collect()),
-                torrents: row.get::<_, Option<String>>(4)?.map(|t| t.split(',').map(String::from).collect()),
+                name: row.get(1)?,
+                torrents: row.get::<_, Option<String>>(2)?.map(|t| t.split(',').map(String::from).collect()),
             }))
         } else {
             Ok(None)
@@ -67,21 +60,18 @@ impl Database {
         let rows = statement.query_map([], |row| {
             Ok(Game {
                 id: row.get(0)?,
-                title: row.get(1)?,
-                description: row.get(2)?,
-                screenshots: row.get::<_, Option<String>>(3)?.map(|s| s.split(',').map(String::from).collect()),
-                torrents: row.get::<_, Option<String>>(4)?.map(|t| t.split(',').map(String::from).collect()),
+                name: row.get(1)?,
+                torrents: row.get::<_, Option<String>>(2)?.map(|t| t.split(',').map(String::from).collect()),
             })
         })?;
         rows.collect()
     }
 
     pub fn update_game(&self, game: &Game) -> Result<()> {
-        let screenshots_str = game.screenshots.as_ref().map(|s| s.join(","));
         let torrents_str = game.torrents.as_ref().map(|t| t.join(","));
         self.connection.execute(
-            "UPDATE games SET title = ?1, description = ?2, screenshots = ?3, torrents = ?4 WHERE id = ?5",
-            params![game.title, game.description, screenshots_str, torrents_str, game.id],
+            "UPDATE games SET name = ?1, torrents = ?2 WHERE id = ?3",
+            params![game.name, torrents_str, game.id],
         )?;
         Ok(())
     }
@@ -102,16 +92,6 @@ impl Database {
 #[derive(Serialize, Deserialize)]
 pub struct Game {
     pub id: String,
-    pub title: String,
-    pub description: Option<String>,
-    pub screenshots: Option<Vec<String>>,
-    pub torrents: Option<Vec<String>>,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct GameInput {
-    pub title: String,
-    pub description: Option<String>,
-    pub screenshots: Option<Vec<String>>,
+    pub name: String,
     pub torrents: Option<Vec<String>>,
 }
