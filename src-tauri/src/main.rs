@@ -3,10 +3,13 @@ mod app_modules;
 use tauri::Manager;
 use futures_timer::Delay;
 use std::time::Duration;
+use std::error::Error;
 use reqwest;
 use tauri::Window;
 
-use app_modules::database::{Database, Game, GameInput};
+use app_modules::database::{Database, Game};
+use app_modules::gamedata::{search_game, get_game_detail, get_game_list, get_game_movies, get_game_screenshots};
+
 static mut DATABASE: Option<Database> = None;
 
 #[tauri::command]
@@ -64,12 +67,12 @@ async fn close_splashscreen(window: Window) {
 
 #[tauri::command]
 async fn add_game(
-    game: GameInput
+    game: Game
 ) -> Result<(), String> {
     unsafe {
         match DATABASE {
             Some(ref mut db) => {
-                match db.add_game(&game.title, game.description.as_deref(), game.screenshots.as_deref(), game.torrents.as_deref()) {
+                match db.add_game(&game.name, game.torrents.as_deref()) {
                     Ok(()) => {
                         println!("Game added successfully!");
                         Ok(())
@@ -113,7 +116,6 @@ async fn update_game(
         }
     }
 }
-
 
 #[tauri::command]
 async fn delete_game(game_id: &str) -> Result<(), String> {
@@ -193,14 +195,55 @@ async fn add_torrent_to_game(
     }
 }
 
-
-fn main() {
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn Error>> {
     unsafe {
         DATABASE = Some(Database::new().expect("Failed to initialize database"));
     }
 
-    // This should be called as early in the execution of the app as possible
-    #[cfg(debug_assertions)] // only enable instrumentation in development builds
+    match get_game_list(Some(1), None).await {
+        Ok(Some(game_list_response)) => {
+            println!("Response: {:?}", game_list_response["results"][0]["name"]);
+        }
+        Ok(None) => println!("No games found."),
+        Err(e) => eprintln!("Error fetching game list: {}", e),
+    }
+
+    let search_query = "The Witcher";
+    match search_game(search_query, None).await {
+        Ok(Some(game_list_response)) => {
+            println!("Search results for '{}': {:?}", search_query, game_list_response["results"][0]["name"]);
+        }
+        Ok(None) => println!("No games found for search query '{}'.", search_query),
+        Err(e) => eprintln!("Error searching for game '{}': {}", search_query, e),
+    }
+
+    let game_id = 3498; // Пример ID игры
+    match get_game_detail(game_id).await {
+        Ok(Some(game_detail)) => {
+            println!("Game details for ID {}: {:?}", game_id, game_detail["name"]);
+        }
+        Ok(None) => println!("No details found for game ID {}.", game_id),
+        Err(e) => eprintln!("Error fetching game details for ID {}: {}", game_id, e),
+    }
+
+    match get_game_screenshots(game_id, Some(1), None).await {
+        Ok(Some(screenshot_list_response)) => {
+            println!("Screenshots for game ID {}: {:?}", game_id, screenshot_list_response["results"][0]["image"]);
+        }
+        Ok(None) => println!("No screenshots found for game ID {}.", game_id),
+        Err(e) => eprintln!("Error fetching screenshots for game ID {}: {}", game_id, e),
+    }
+
+    match get_game_movies(game_id, None).await {
+        Ok(Some(movie_list_response)) => {
+            println!("Movies for game ID {}: {:?}", game_id, movie_list_response["results"][0]["preview"]);
+        }
+        Ok(None) => println!("No movies found for game ID {}.", game_id),
+        Err(e) => eprintln!("Error fetching movies for game ID {}: {}", game_id, e),
+    }
+
+    #[cfg(debug_assertions)]
         let devtools = devtools::init();
 
     let builder = tauri::Builder::default();
@@ -222,4 +265,6 @@ fn main() {
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+
+    Ok(())
 }

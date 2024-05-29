@@ -1,7 +1,7 @@
 import { invoke } from '@tauri-apps/api';
-import {IGame, IGameInput} from "@/types";
+import {IGame} from "@/types";
 
-export async function addGame(game: IGameInput): Promise<void> {
+export async function addGame(game: IGame): Promise<void> {
     invoke('add_game', { game });
 }
 

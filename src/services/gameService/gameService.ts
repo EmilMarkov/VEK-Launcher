@@ -1,4 +1,4 @@
-import {IGame, IGameInput} from '@/types'; // Путь к вашему интерфейсу IGame
+import {IGame} from '@/types'; // Путь к вашему интерфейсу IGame
 import * as databaseService from '@services/databaseService'; // Путь к вашему databaseService
 import Fuse from 'fuse.js';
 import { nanoid } from 'nanoid';
@@ -15,9 +15,9 @@ class GameService {
     });
   }
 
-  async addGame(game: IGameInput): Promise<void> {
+  async addGame(game: IGame): Promise<void> {
     const games = await this.getAllGames();
-    if (games.some(g => g.title.toLowerCase() === game.title.toLowerCase())) {
+    if (games.some(g => g.name.toLowerCase() === game.name.toLowerCase())) {
       throw new Error('GameEntity title must be unique');
     }
 
@@ -57,15 +57,9 @@ class GameService {
     return torrent;
   }
 
-  async updateGameById(gameId: string, updateData: Partial<Omit<IGame, 'id' | 'title'>>): Promise<void> {
-    getGameById(gameId).then(async (result) => {
+  async updateGameById(game: IGame): Promise<void> {
+    getGameById(game.id).then(async (result) => {
       if (result) {
-        const game: IGame = {
-          id: gameId,
-          title: result.title,
-          ...updateData
-        }
-
         await databaseService.updateGame(game);
       }
     });
