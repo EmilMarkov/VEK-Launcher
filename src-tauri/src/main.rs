@@ -234,14 +234,14 @@ async fn main() -> Result<(), Box<dyn Error>> {
     //     Err(e) => eprintln!("Error fetching game list: {}", e),
     // }
 
-    let search_query = "Смута";
-    match search_game(search_query, None).await {
-        Ok(Some(game_list_response)) => {
-            println!("Search results for '{}': {:?}", search_query, game_list_response);
-        }
-        Ok(None) => println!("No games found for search query '{}'.", search_query),
-        Err(e) => eprintln!("Error searching for game '{}': {}", search_query, e),
-    }
+    // let search_query = "Смута";
+    // match search_game(search_query, None).await {
+    //     Ok(Some(game_list_response)) => {
+    //         println!("Search results for '{}': {:?}", search_query, game_list_response);
+    //     }
+    //     Ok(None) => println!("No games found for search query '{}'.", search_query),
+    //     Err(e) => eprintln!("Error searching for game '{}': {}", search_query, e),
+    // }
 
     // let game_id = 3498;
     // match get_game_detail(game_id).await {
