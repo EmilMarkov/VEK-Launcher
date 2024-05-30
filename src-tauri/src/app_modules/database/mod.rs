@@ -2,6 +2,9 @@ use rusqlite::{params, Connection, Result};
 use serde::{Serialize, Deserialize};
 use rusqlite::Error;
 use uuid::Uuid;
+use std::path::{Path, PathBuf};
+use std::fs;
+use dirs;
 
 pub struct Database {
     connection: Connection,
@@ -9,7 +12,8 @@ pub struct Database {
 
 impl Database {
     pub fn new() -> Result<Self, Error> {
-        match Connection::open("./games.db") {
+        let db_path = Self::get_database_path()?;
+        match Connection::open(&db_path) {
             Ok(connection) => {
                 match connection.execute(
                     "CREATE TABLE IF NOT EXISTS games (
@@ -27,6 +31,22 @@ impl Database {
         }
     }
 
+    fn get_database_path() -> Result<PathBuf, Error> {
+        let mut path = dirs::data_local_dir().ok_or_else(|| {
+            rusqlite::Error::InvalidPath("Could not determine local data directory".into())
+        })?;
+
+        path.push("VEKLauncher");
+        if !path.exists() {
+            fs::create_dir_all(&path).map_err(|e| {
+                rusqlite::Error::InvalidPath(format!("Could not create directory: {}", e).into())
+            })?;
+        }
+
+        path.push("veklauncher.db");
+        Ok(path)
+    }
+
     pub fn add_game(
         &self,
         name: &str,
@@ -35,7 +55,7 @@ impl Database {
         let id = Uuid::new_v4().to_string();
         let torrents_str = torrents.map(|t| t.join(","));
         self.connection.execute(
-            "INSERT INTO games (id, title, torrents) VALUES (?1, ?2, ?3)",
+            "INSERT INTO games (id, name, torrents) VALUES (?1, ?2, ?3)",
             params![&id, name, torrents_str],
         )?;
         Ok(())
