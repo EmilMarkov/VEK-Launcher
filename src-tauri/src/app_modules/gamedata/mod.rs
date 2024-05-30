@@ -86,7 +86,6 @@ pub async fn update_api_key() -> Result<(), Box<dyn Error>> {
         if let Some(api_key) = caps.get(1) {
             let mut key = API_KEY.lock().unwrap();
             *key = api_key.as_str().to_string();
-            println!("API Key updated: {}", *key);
             return Ok(());
         }
     }
