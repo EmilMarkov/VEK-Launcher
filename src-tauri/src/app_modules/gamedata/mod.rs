@@ -2,9 +2,15 @@ use reqwest;
 use serde_json::Value;
 use reqwest::StatusCode;
 use std::error::Error;
-use std::{env, fmt};
+use std::fmt;
 use tokio;
+use lazy_static::lazy_static;
+use regex::Regex;
+use std::sync::Mutex;
 
+lazy_static! {
+    static ref API_KEY: Mutex<String> = Mutex::new(String::new());
+}
 
 const BASE_URL: &str = "https://api.rawg.io/api/";
 const PAGE_SIZE: usize = 200;
@@ -41,7 +47,7 @@ impl From<reqwest::Error> for ApiError {
     }
 }
 
-async fn get(url: &str) -> Result<Value, Box<dyn Error>> {
+async fn get(url: &str, retry: bool) -> Result<Value, Box<dyn Error>> {
     let resp = reqwest::get(url).await.map_err(ApiError::from)?;
     let status = resp.status();
     let body = resp.text().await.map_err(ApiError::from)?;
@@ -50,6 +56,19 @@ async fn get(url: &str) -> Result<Value, Box<dyn Error>> {
         StatusCode::OK => {
             serde_json::from_str::<Value>(&body).map_err(|e| Box::new(ApiError::JsonError(format!("Failed to parse JSON: {}", e))) as Box<dyn Error>)
         },
+        StatusCode::UNAUTHORIZED => {
+            if retry {
+                update_api_key().await?;
+                let new_resp = reqwest::get(url).await.map_err(ApiError::from)?;
+                let new_status = new_resp.status();
+                let new_body = new_resp.text().await.map_err(ApiError::from)?;
+                if new_status == StatusCode::OK {
+                    return serde_json::from_str::<Value>(&new_body)
+                        .map_err(|e| Box::new(ApiError::JsonError(format!("Failed to parse JSON: {}", e))) as Box<dyn Error>);
+                }
+            }
+            Err(Box::new(ApiError::ClientError(format!("Client Error: {}. Response body: {}", status, body))))
+        },
         StatusCode::NOT_FOUND => Err(Box::new(ApiError::NotFound(format!("API Error: Not found. Response body: {}", body)))),
         status if status.is_client_error() => Err(Box::new(ApiError::ClientError(format!("Client Error: {}. Response body: {}", status, body)))),
         status if status.is_server_error() => Err(Box::new(ApiError::ServerError(format!("Server Error: {}. Response body: {}", status, body)))),
@@ -57,8 +76,26 @@ async fn get(url: &str) -> Result<Value, Box<dyn Error>> {
     }
 }
 
+pub async fn update_api_key() -> Result<(), Box<dyn Error>> {
+    let url = "https://rawg.io/";
+    let resp = reqwest::get(url).await?;
+    let body = resp.text().await?;
+
+    let re = Regex::new(r#""rawgApiKey":"([a-zA-Z0-9]+)""#)?;
+    if let Some(caps) = re.captures(&body) {
+        if let Some(api_key) = caps.get(1) {
+            let mut key = API_KEY.lock().unwrap();
+            *key = api_key.as_str().to_string();
+            println!("API Key updated: {}", *key);
+            return Ok(());
+        }
+    }
+
+    Err("API Key not found".into())
+}
+
 pub async fn get_game_list(page: Option<usize>, next: Option<&str>) -> Result<Option<Value>, Box<dyn Error>> {
-    let api_key = env::var("VEK_API_KEY").expect("VEK_API_KEY must be set");
+    let api_key = API_KEY.lock().unwrap().clone();
     let url = if let Some(next_url) = next {
         next_url.to_string()
     } else {
@@ -68,12 +105,12 @@ pub async fn get_game_list(page: Option<usize>, next: Option<&str>) -> Result<Op
         )
     };
 
-    let response = get(&url).await?;
+    let response = get(&url, true).await?;
     Ok(Some(response))
 }
 
 pub async fn search_game(query: &str, next: Option<&str>) -> Result<Option<Value>, Box<dyn Error>> {
-    let api_key = env::var("VEK_API_KEY").expect("VEK_API_KEY must be set");
+    let api_key = API_KEY.lock().unwrap().clone();
     let url = if let Some(next_url) = next {
         next_url.to_string()
     } else {
@@ -83,20 +120,20 @@ pub async fn search_game(query: &str, next: Option<&str>) -> Result<Option<Value
         )
     };
 
-    let response = get(&url).await?;
+    let response = get(&url, true).await?;
     Ok(Some(response))
 }
 
 pub async fn get_game_detail(id: i32) -> Result<Option<Value>, Box<dyn Error>> {
-    let api_key = env::var("VEK_API_KEY").expect("VEK_API_KEY must be set");
+    let api_key = API_KEY.lock().unwrap().clone();
     let url = format!("{}games/{}?key={}", BASE_URL, id, api_key);
 
-    let response = get(&url).await?;
+    let response = get(&url, true).await?;
     Ok(Some(response))
 }
 
 pub async fn get_game_screenshots(id: i32, page: Option<usize>, next: Option<&str>) -> Result<Option<Value>, Box<dyn Error>> {
-    let api_key = env::var("VEK_API_KEY").expect("VEK_API_KEY must be set");
+    let api_key = API_KEY.lock().unwrap().clone();
     let url = if let Some(next_url) = next {
         next_url.to_string()
     } else {
@@ -106,18 +143,18 @@ pub async fn get_game_screenshots(id: i32, page: Option<usize>, next: Option<&st
         )
     };
 
-    let response = get(&url).await?;
+    let response = get(&url, true).await?;
     Ok(Some(response))
 }
 
 pub async fn get_game_movies(id: i32, next: Option<&str>) -> Result<Option<Value>, Box<dyn Error>> {
-    let api_key = env::var("VEK_API_KEY").expect("VEK_API_KEY must be set");
+    let api_key = API_KEY.lock().unwrap().clone();
     let url = if let Some(next_url) = next {
         next_url.to_string()
     } else {
         format!("{}games/{}/movies?key={}", BASE_URL, id, api_key)
     };
 
-    let response = get(&url).await?;
+    let response = get(&url, true).await?;
     Ok(Some(response))
 }

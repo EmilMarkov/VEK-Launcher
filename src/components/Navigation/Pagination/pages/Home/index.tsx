@@ -13,7 +13,7 @@ import {
     Container,
     Props,
 } from './styles';
-import {IGame, IGameInput} from "@/types";
+import {IGame} from "@/types";
 
 const HomePage: React.FC<Props> = ({ pageName, visible }) => {
 
