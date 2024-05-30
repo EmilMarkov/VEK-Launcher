@@ -1,6 +1,6 @@
 import process from 'process';
 import parseTorrent, {toMagnetURI} from 'parse-torrent';
-import { Buffer } from 'buffer'; // Импортируем Buffer явно
+import { Buffer } from 'buffer';
 
 self.process = process;
 

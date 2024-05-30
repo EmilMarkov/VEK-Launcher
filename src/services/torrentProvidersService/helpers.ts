@@ -35,7 +35,7 @@ export const getFileBuffer = async (url: string): Promise<Uint8Array> => {
     return new Uint8Array(arrayBuffer);
   } catch (error) {
     console.error('Error fetching file buffer:', error);
-    throw error; // Проброс исключения для обработки на более высоком уровне
+    throw error;
   }
 }
 
@@ -47,7 +47,7 @@ export const requestWebPage = async (url: string): Promise<string> => {
   try {
     return await invoke<string>('fetch_web_content', { url });
   } catch (error) {
-    console.error(`Ошибка при получении контента с ${url}:`, error);
+    console.error(`Error with responsing content from ${url}:`, error);
     return "";
   }
 };

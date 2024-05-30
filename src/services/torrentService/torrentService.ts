@@ -1,15 +1,14 @@
 import TorrentParserWorker from './torrent-parser.worker.js?worker';
 import { gameService } from '@services/gameService/gameService';
 import {IGame} from "@/types";
-import { toMagnetURI } from 'parse-torrent';
-import { Semaphore } from 'async-mutex';  // Импортируем Semaphore из async-mutex
+import { Semaphore } from 'async-mutex';
 
 const MAX_WORKERS = 11;
 const semaphore = new Semaphore(MAX_WORKERS);
 
 class TorrentService {
   public async addTorrentByBuffer(buffer: Uint8Array, title: string): Promise<string> {
-    const [value, release] = await semaphore.acquire();  // Корректно получаем семафор и функцию release
+    const [value, release] = await semaphore.acquire();
     return new Promise((resolve, reject) => {
       const worker = new TorrentParserWorker();
 
@@ -21,27 +20,27 @@ class TorrentService {
                   gameService.addTorrentToGame(game.id, data)
                       .then(resolve)
                       .catch(reject)
-                      .finally(release);  // Освобождаем семафор после завершения
+                      .finally(release);
                 } else {
                   resolve("");
-                  release();  // Освобождаем семафор после завершения
+                  release();
                 }
               })
               .catch(err => {
                 reject(err);
-                release();  // Освобождаем семафор после завершения
+                release();
               });
         } else {
           console.error('Failed to parse torrent file', data.error);
           resolve("");
-          release();  // Освобождаем семафор после завершения
+          release();
         }
       };
 
       worker.onerror = (error) => {
         console.error('Worker error:', error);
         resolve("");
-        release();  // Освобождаем семафор после завершения
+        release();
       };
 
       worker.postMessage(buffer);

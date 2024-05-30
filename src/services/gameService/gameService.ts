@@ -1,5 +1,5 @@
-import {IGame} from '@/types'; // Путь к вашему интерфейсу IGame
-import * as databaseService from '@services/databaseService'; // Путь к вашему databaseService
+import {IGame} from '@/types';
+import * as databaseService from '@services/databaseService';
 import Fuse from 'fuse.js';
 import { nanoid } from 'nanoid';
 import {getGameById} from "@services/databaseService";
@@ -11,7 +11,7 @@ class GameService {
     const games = await this.getAllGames();
     this.fuse = new Fuse(games, {
       keys: ['title'],
-      threshold: 0.2 // Настройте threshold по необходимости
+      threshold: 0.2
     });
   }
 

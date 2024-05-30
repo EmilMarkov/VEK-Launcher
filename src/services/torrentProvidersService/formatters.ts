@@ -1,5 +1,3 @@
-/* String formatting */
-
 export const removeReleaseYearFromName = (name: string) =>
     name.replace(/\([0-9]{4}\)/g, "");
 
@@ -18,7 +16,7 @@ export const removeDuplicateSpaces = (name: string) =>
 export const removeTrash = (title: string) =>
     title.replace(/\(.*\)|\[.*]/g, "").replace(/:/g, "");
 
-/* Formatters per repacker */
+
 
 export const fitGirlFormatter = (title: string) =>
     title.replace(/\(.*\)/g, "").trim();

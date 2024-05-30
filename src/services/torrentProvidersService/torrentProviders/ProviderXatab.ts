@@ -27,7 +27,7 @@ export class ProviderXatab {
       console.log(`Все задачи в pageQueue завершены.`);
       if (this.processedPages < this.totalPages) {
         console.log("Добавляем следующую партию страниц...");
-        this.collectPages(Math.min(this.maxPageInQueue + 10, this.totalPages)); // Collect next pages batch
+        this.collectPages(Math.min(this.maxPageInQueue + 10, this.totalPages));
       } else {
         console.log('Все страницы обработаны.');
         this.torrentQueue.drain(() => {
@@ -43,7 +43,7 @@ export class ProviderXatab {
       return await requestWebPage(url);
     } catch (error) {
       console.error(`Ошибка запроса к странице ${url}: ${error instanceof Error ? error.message : String(error)}`);
-      return '';  // Возвращаем пустую строку в случае ошибки
+      return '';
     }
   }
 
@@ -68,7 +68,7 @@ export class ProviderXatab {
   private processPage(page: number, callback: () => void): void {
     console.log(`Начинаем обработку страницы: ${page}`);
     this.request(`/page/${page}`).then((data) => {
-      if (!data || data.length < 100) {  // Проверяем, что получен ответ достаточной длины
+      if (!data || data.length < 100) {
         console.log(`Получен недостаточный ответ от сервера для страницы ${page}`);
         callback();
         return;
@@ -109,13 +109,13 @@ export class ProviderXatab {
   }
 
   public async initScraping(): Promise<void> {
-    this.totalPages = await this.getTotalPages(); // Убедитесь, что этот вызов корректно определяет количество страниц
+    this.totalPages = await this.getTotalPages();
     console.log(`Начинаем скрапинг. Всего страниц: ${this.totalPages}`);
-    this.collectPages(Math.min(10, this.totalPages)); // Начните с первых 10 страниц или меньше, если страниц меньше
+    this.collectPages(Math.min(10, this.totalPages));
   }
 
   private collectPages(upToPage: number): void {
-    let currentPage = this.maxPageInQueue + 1; // Продолжаем с последней обработанной страницы
+    let currentPage = this.maxPageInQueue + 1;
     this.maxPageInQueue = upToPage;
     while (currentPage <= upToPage) {
       console.log(`Добавляем страницу ${currentPage} в очередь.`);
