@@ -2,9 +2,10 @@ use reqwest;
 use serde_json::Value;
 use reqwest::StatusCode;
 use std::error::Error;
-use std::fmt;
+use std::{env, fmt};
+use tokio;
 
-const API_KEY: &str = "c542e67aec3a4340908f9de9e86038af";
+
 const BASE_URL: &str = "https://api.rawg.io/api/";
 const PAGE_SIZE: usize = 200;
 const PLAY_ON_DESKTOP: bool = true;
@@ -57,12 +58,13 @@ async fn get(url: &str) -> Result<Value, Box<dyn Error>> {
 }
 
 pub async fn get_game_list(page: Option<usize>, next: Option<&str>) -> Result<Option<Value>, Box<dyn Error>> {
+    let api_key = env::var("VEK_API_KEY").expect("VEK_API_KEY must be set");
     let url = if let Some(next_url) = next {
         next_url.to_string()
     } else {
         format!(
             "{}games?key={}&page={}&page_size={}&play_on_desktop={}",
-            BASE_URL, API_KEY, page.unwrap_or(1), PAGE_SIZE, PLAY_ON_DESKTOP
+            BASE_URL, api_key, page.unwrap_or(1), PAGE_SIZE, PLAY_ON_DESKTOP
         )
     };
 
@@ -71,12 +73,13 @@ pub async fn get_game_list(page: Option<usize>, next: Option<&str>) -> Result<Op
 }
 
 pub async fn search_game(query: &str, next: Option<&str>) -> Result<Option<Value>, Box<dyn Error>> {
+    let api_key = env::var("VEK_API_KEY").expect("VEK_API_KEY must be set");
     let url = if let Some(next_url) = next {
         next_url.to_string()
     } else {
         format!(
             "{}games?search={}&key={}&play_on_desktop={}",
-            BASE_URL, query, API_KEY, PLAY_ON_DESKTOP
+            BASE_URL, query, api_key, PLAY_ON_DESKTOP
         )
     };
 
@@ -85,19 +88,21 @@ pub async fn search_game(query: &str, next: Option<&str>) -> Result<Option<Value
 }
 
 pub async fn get_game_detail(id: i32) -> Result<Option<Value>, Box<dyn Error>> {
-    let url = format!("{}games/{}?key={}", BASE_URL, id, API_KEY);
+    let api_key = env::var("VEK_API_KEY").expect("VEK_API_KEY must be set");
+    let url = format!("{}games/{}?key={}", BASE_URL, id, api_key);
 
     let response = get(&url).await?;
     Ok(Some(response))
 }
 
 pub async fn get_game_screenshots(id: i32, page: Option<usize>, next: Option<&str>) -> Result<Option<Value>, Box<dyn Error>> {
+    let api_key = env::var("VEK_API_KEY").expect("VEK_API_KEY must be set");
     let url = if let Some(next_url) = next {
         next_url.to_string()
     } else {
         format!(
             "{}games/{}/screenshots?key={}&page={}",
-            BASE_URL, id, API_KEY, page.unwrap_or(1)
+            BASE_URL, id, api_key, page.unwrap_or(1)
         )
     };
 
@@ -106,10 +111,11 @@ pub async fn get_game_screenshots(id: i32, page: Option<usize>, next: Option<&st
 }
 
 pub async fn get_game_movies(id: i32, next: Option<&str>) -> Result<Option<Value>, Box<dyn Error>> {
+    let api_key = env::var("VEK_API_KEY").expect("VEK_API_KEY must be set");
     let url = if let Some(next_url) = next {
         next_url.to_string()
     } else {
-        format!("{}games/{}/movies?key={}", BASE_URL, id, API_KEY)
+        format!("{}games/{}/movies?key={}", BASE_URL, id, api_key)
     };
 
     let response = get(&url).await?;

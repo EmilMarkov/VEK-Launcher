@@ -9,6 +9,22 @@ use tauri::Window;
 
 use app_modules::database::{Database, Game};
 use app_modules::gamedata::{search_game, get_game_detail, get_game_list, get_game_movies, get_game_screenshots};
+use std::process::Command;
+use dotenv::dotenv;
+
+fn load_api_key() -> Result<String, String> {
+    let output = Command::new("python3")
+        .arg("get_api_key.py")
+        .output()
+        .map_err(|e| e.to_string())?;
+
+    if output.status.success() {
+        Ok(String::from_utf8_lossy(&output.stdout).to_string())
+    } else {
+        Err(String::from_utf8_lossy(&output.stderr).to_string())
+    }
+}
+
 
 static mut DATABASE: Option<Database> = None;
 
@@ -201,47 +217,56 @@ async fn main() -> Result<(), Box<dyn Error>> {
         DATABASE = Some(Database::new().expect("Failed to initialize database"));
     }
 
-    match get_game_list(Some(1), None).await {
-        Ok(Some(game_list_response)) => {
-            println!("Response: {:?}", game_list_response["results"][0]["name"]);
-        }
-        Ok(None) => println!("No games found."),
-        Err(e) => eprintln!("Error fetching game list: {}", e),
-    }
+    // match get_api_key().await {
+    //     Ok(key) => println!("Found API key: {:?}", key),
+    //     Err(e) => eprintln!("Error: {}", e),
+    // }
 
-    let search_query = "The Witcher";
+    load_api_key().expect("TODO: panic message");
+
+    dotenv().ok();
+
+    // match get_game_list(Some(1), None).await {
+    //     Ok(Some(game_list_response)) => {
+    //         println!("Response: {:?}", game_list_response["results"][0]["name"]);
+    //     }
+    //     Ok(None) => println!("No games found."),
+    //     Err(e) => eprintln!("Error fetching game list: {}", e),
+    // }
+
+    let search_query = "Смута";
     match search_game(search_query, None).await {
         Ok(Some(game_list_response)) => {
-            println!("Search results for '{}': {:?}", search_query, game_list_response["results"][0]["name"]);
+            println!("Search results for '{}': {:?}", search_query, game_list_response);
         }
         Ok(None) => println!("No games found for search query '{}'.", search_query),
         Err(e) => eprintln!("Error searching for game '{}': {}", search_query, e),
     }
 
-    let game_id = 3498; // Пример ID игры
-    match get_game_detail(game_id).await {
-        Ok(Some(game_detail)) => {
-            println!("Game details for ID {}: {:?}", game_id, game_detail["name"]);
-        }
-        Ok(None) => println!("No details found for game ID {}.", game_id),
-        Err(e) => eprintln!("Error fetching game details for ID {}: {}", game_id, e),
-    }
-
-    match get_game_screenshots(game_id, Some(1), None).await {
-        Ok(Some(screenshot_list_response)) => {
-            println!("Screenshots for game ID {}: {:?}", game_id, screenshot_list_response["results"][0]["image"]);
-        }
-        Ok(None) => println!("No screenshots found for game ID {}.", game_id),
-        Err(e) => eprintln!("Error fetching screenshots for game ID {}: {}", game_id, e),
-    }
-
-    match get_game_movies(game_id, None).await {
-        Ok(Some(movie_list_response)) => {
-            println!("Movies for game ID {}: {:?}", game_id, movie_list_response["results"][0]["preview"]);
-        }
-        Ok(None) => println!("No movies found for game ID {}.", game_id),
-        Err(e) => eprintln!("Error fetching movies for game ID {}: {}", game_id, e),
-    }
+    // let game_id = 3498;
+    // match get_game_detail(game_id).await {
+    //     Ok(Some(game_detail)) => {
+    //         println!("Game details for ID {}: {:?}", game_id, game_detail["name"]);
+    //     }
+    //     Ok(None) => println!("No details found for game ID {}.", game_id),
+    //     Err(e) => eprintln!("Error fetching game details for ID {}: {}", game_id, e),
+    // }
+    //
+    // match get_game_screenshots(game_id, Some(1), None).await {
+    //     Ok(Some(screenshot_list_response)) => {
+    //         println!("Screenshots for game ID {}: {:?}", game_id, screenshot_list_response["results"][0]["image"]);
+    //     }
+    //     Ok(None) => println!("No screenshots found for game ID {}.", game_id),
+    //     Err(e) => eprintln!("Error fetching screenshots for game ID {}: {}", game_id, e),
+    // }
+    //
+    // match get_game_movies(game_id, None).await {
+    //     Ok(Some(movie_list_response)) => {
+    //         println!("Movies for game ID {}: {:?}", game_id, movie_list_response["results"][0]["preview"]);
+    //     }
+    //     Ok(None) => println!("No movies found for game ID {}.", game_id),
+    //     Err(e) => eprintln!("Error fetching movies for game ID {}: {}", game_id, e),
+    // }
 
     #[cfg(debug_assertions)]
         let devtools = devtools::init();

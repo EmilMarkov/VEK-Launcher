@@ -1,7 +1,7 @@
 {
   "build": {
-    "beforeDevCommand": "yarn dev",
-    "beforeBuildCommand": "yarn build",
+    "beforeDevCommand": "yarn dev && pip install -r requirements.txt",
+    "beforeBuildCommand": "yarn build && pip install -r requirements.txt",
     "devPath": "http://localhost:1420",
     "distDir": "../dist",
     "withGlobalTauri": false
