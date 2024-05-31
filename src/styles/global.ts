@@ -32,7 +32,7 @@ export default createGlobalStyle`
     // Set Abel font
     h1, h2, h3, input,
     .big-number,
-    .percentage {
+    .status {
         font-family: 'Abel', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji' !important;
     }
     // Set Hx size

@@ -1,39 +1,33 @@
 import { invoke } from '@tauri-apps/api';
-import {IGame} from "@/types";
+import {ITorrent} from "@/types";
 
-export async function addGame(game: IGame): Promise<void> {
-    invoke('add_game', { game });
+
+export async function addTorrent(game: ITorrent): Promise<void> {
+    invoke('add_torrent', { game });
 }
 
-export async function getGameById(id: string): Promise<IGame | null> {
+export async function getTorrentById(id: string): Promise<ITorrent | null> {
     try {
-        return await invoke<IGame>('get_game_by_id');
+        return await invoke<ITorrent>('get_torrent_by_id');
     } catch (error) {
-        console.error("Failed to fetch games:", error);
+        console.error("Failed to fetch torrents:", error);
         return null;
     }
 }
 
-export async function getAllGames(): Promise<IGame[]> {
+export async function getAllTorrents(): Promise<ITorrent[]> {
     try {
-        return await invoke<IGame[]>('get_all_games');
+        return await invoke<ITorrent[]>('get_all_torrents');
     } catch (error) {
-        console.error("Failed to fetch games:", error);
+        console.error("Failed to fetch torrents:", error);
         return [];
     }
 }
 
-
-export async function updateGame(game: IGame): Promise<void> {
-    invoke('update_game', { game });
+export async function updateTorrent(game: ITorrent): Promise<void> {
+    invoke('update_torrent', { game });
 }
 
-export async function addTorrentToGame(id: string, torrent: string): Promise<void> {
-    invoke('add_torrent', { id, torrent })
-}
-
-export async function deleteGame(id: string): Promise<void> {
-    invoke('delete_game', {
-        id: id
-    });
+export async function deleteTorrent(id: string): Promise<void> {
+    invoke('delete_torrent', { id: id });
 }

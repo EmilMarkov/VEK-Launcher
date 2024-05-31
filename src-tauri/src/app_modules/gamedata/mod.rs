@@ -3,7 +3,6 @@ use serde_json::Value;
 use reqwest::StatusCode;
 use std::error::Error;
 use std::fmt;
-use tokio;
 use lazy_static::lazy_static;
 use regex::Regex;
 use std::sync::Mutex;
@@ -93,7 +92,8 @@ pub async fn update_api_key() -> Result<(), Box<dyn Error>> {
     Err("API Key not found".into())
 }
 
-pub async fn get_game_list(page: Option<usize>, next: Option<&str>) -> Result<Option<Value>, Box<dyn Error>> {
+#[tauri::command]
+pub async fn get_game_list(page: Option<usize>, next: Option<&str>) -> Result<Option<Value>, String> {
     let api_key = API_KEY.lock().unwrap().clone();
     let url = if let Some(next_url) = next {
         next_url.to_string()
@@ -104,11 +104,12 @@ pub async fn get_game_list(page: Option<usize>, next: Option<&str>) -> Result<Op
         )
     };
 
-    let response = get(&url, true).await?;
+    let response = get(&url, true).await.map_err(|e| e.to_string())?;
     Ok(Some(response))
 }
 
-pub async fn search_game(query: &str, next: Option<&str>) -> Result<Option<Value>, Box<dyn Error>> {
+#[tauri::command]
+pub async fn search_game(query: &str, next: Option<&str>) -> Result<Option<Value>, String> {
     let api_key = API_KEY.lock().unwrap().clone();
     let url = if let Some(next_url) = next {
         next_url.to_string()
@@ -119,19 +120,21 @@ pub async fn search_game(query: &str, next: Option<&str>) -> Result<Option<Value
         )
     };
 
-    let response = get(&url, true).await?;
+    let response = get(&url, true).await.map_err(|e| e.to_string())?;
     Ok(Some(response))
 }
 
-pub async fn get_game_detail(id: i32) -> Result<Option<Value>, Box<dyn Error>> {
+#[tauri::command]
+pub async fn get_game_detail(id: i32) -> Result<Option<Value>, String> {
     let api_key = API_KEY.lock().unwrap().clone();
     let url = format!("{}games/{}?key={}", BASE_URL, id, api_key);
 
-    let response = get(&url, true).await?;
+    let response = get(&url, true).await.map_err(|e| e.to_string())?;
     Ok(Some(response))
 }
 
-pub async fn get_game_screenshots(id: i32, page: Option<usize>, next: Option<&str>) -> Result<Option<Value>, Box<dyn Error>> {
+#[tauri::command]
+pub async fn get_game_screenshots(id: i32, page: Option<usize>, next: Option<&str>) -> Result<Option<Value>, String> {
     let api_key = API_KEY.lock().unwrap().clone();
     let url = if let Some(next_url) = next {
         next_url.to_string()
@@ -142,11 +145,12 @@ pub async fn get_game_screenshots(id: i32, page: Option<usize>, next: Option<&st
         )
     };
 
-    let response = get(&url, true).await?;
+    let response = get(&url, true).await.map_err(|e| e.to_string())?;
     Ok(Some(response))
 }
 
-pub async fn get_game_movies(id: i32, next: Option<&str>) -> Result<Option<Value>, Box<dyn Error>> {
+#[tauri::command]
+pub async fn get_game_movies(id: i32, next: Option<&str>) -> Result<Option<Value>, String> {
     let api_key = API_KEY.lock().unwrap().clone();
     let url = if let Some(next_url) = next {
         next_url.to_string()
@@ -154,6 +158,6 @@ pub async fn get_game_movies(id: i32, next: Option<&str>) -> Result<Option<Value
         format!("{}games/{}/movies?key={}", BASE_URL, id, api_key)
     };
 
-    let response = get(&url, true).await?;
+    let response = get(&url, true).await.map_err(|e| e.to_string())?;
     Ok(Some(response))
 }

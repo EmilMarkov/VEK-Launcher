@@ -24,7 +24,7 @@ dirs = "5.0.1"
 sysinfo = "0.30.12"
 lazy_static = "1.4.0"
 devtools = "0.3.1"
-reqwest = { version = "0.12.4", features = ["json"] }
+reqwest = { version = "0.12.4", features = ["json", "blocking"] }
 futures-timer = "3.0.3"
 bytes = "1.6.0"
 rusqlite = "0.31.0"
@@ -33,6 +33,12 @@ tokio = { version = "1.0.0", features = ["full"] }
 thiserror = "1.0.61"
 regex = "1.10.4"
 dotenv = "0.15.0"
+scraper = "0.19.0"
+hex = "0.4.3"
+url = "2.5.0"
+rs_torrent_magnet = "0.2.0"
+futures = "0.3.30"
+
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem

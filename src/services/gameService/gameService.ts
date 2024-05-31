@@ -1,69 +1,50 @@
-import {IGame} from '@/types';
-import * as databaseService from '@services/databaseService';
-import Fuse from 'fuse.js';
-import { nanoid } from 'nanoid';
-import {getGameById} from "@services/databaseService";
+import { invoke } from '@tauri-apps/api/tauri';
 
 class GameService {
-  private fuse: Fuse<IGame> | null = null;
-
-  private async initializeFuse() {
-    const games = await this.getAllGames();
-    this.fuse = new Fuse(games, {
-      keys: ['title'],
-      threshold: 0.2
-    });
-  }
-
-  async addGame(game: IGame): Promise<void> {
-    const games = await this.getAllGames();
-    if (games.some(g => g.name.toLowerCase() === game.name.toLowerCase())) {
-      throw new Error('GameEntity title must be unique');
+    async getGameList(page?: number, next?: string): Promise<any> {
+        try {
+            return await invoke('get_game_list', { page, next });
+        } catch (error) {
+            console.error('Error fetching game list:', error);
+            throw error;
+        }
     }
 
-    await databaseService.addGame(game);
-    await this.initializeFuse();
-  }
-
-  async getGameById(id: string): Promise<IGame | null> {
-    return await databaseService.getGameById(id);
-  }
-
-  async getAllGames(): Promise<IGame[]> {
-    return await databaseService.getAllGames();
-  }
-
-  async getGameByTitle(title: string): Promise<IGame | null> {
-    if (!this.fuse) {
-      await this.initializeFuse();
+    async searchGame(query: string, next?: string): Promise<any> {
+        try {
+            return await invoke('search_game', { query, next });
+        } catch (error) {
+            console.error('Error searching game:', error);
+            throw error;
+        }
     }
 
-    const results = this.fuse?.search(title) ?? [];
-
-    return results.length > 0 ? results[0].item : null;
-  }
-
-  async getGamesByTitle(title: string): Promise<IGame[]> {
-    if (!this.fuse) {
-      await this.initializeFuse();
+    async getGameDetail(id: number): Promise<any> {
+        try {
+            return await invoke('get_game_detail', { id });
+        } catch (error) {
+            console.error('Error fetching game detail:', error);
+            throw error;
+        }
     }
 
-    const results = this.fuse?.search(title) ?? [];
-    return results.map(result => result.item);
-  }
+    async getGameScreenshots(id: number, page?: number, next?: string): Promise<any> {
+        try {
+            return await invoke('get_game_screenshots', { id, page, next });
+        } catch (error) {
+            console.error('Error fetching game screenshots:', error);
+            throw error;
+        }
+    }
 
-  async addTorrentToGame(gameId: string, torrent: string): Promise<string> {
-    await databaseService.addTorrentToGame(gameId, torrent);
-    return torrent;
-  }
-
-  async updateGameById(game: IGame): Promise<void> {
-    getGameById(game.id).then(async (result) => {
-      if (result) {
-        await databaseService.updateGame(game);
-      }
-    });
-  }
+    async getGameMovies(id: number, next?: string): Promise<any> {
+        try {
+            return await invoke('get_game_movies', { id, next });
+        } catch (error) {
+            console.error('Error fetching game movies:', error);
+            throw error;
+        }
+    }
 }
 
 export const gameService = new GameService();

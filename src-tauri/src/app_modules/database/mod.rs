@@ -2,10 +2,11 @@ use rusqlite::{params, Connection, Result};
 use serde::{Serialize, Deserialize};
 use rusqlite::Error;
 use uuid::Uuid;
-use std::path::{Path, PathBuf};
+use std::path::{PathBuf};
 use std::fs;
 use dirs;
 
+#[derive(Debug)]
 pub struct Database {
     connection: Connection,
 }
@@ -16,10 +17,11 @@ impl Database {
         match Connection::open(&db_path) {
             Ok(connection) => {
                 match connection.execute(
-                    "CREATE TABLE IF NOT EXISTS games (
+                    "CREATE TABLE IF NOT EXISTS torrents (
                     id TEXT PRIMARY KEY,
                     name TEXT NOT NULL,
-                    torrents TEXT
+                    repacker TEXT,
+                    torrent TEXT
                 )",
                     [],
                 ) {
@@ -47,71 +49,79 @@ impl Database {
         Ok(path)
     }
 
-    pub fn add_game(
+    pub fn add_torrent(
         &self,
         name: &str,
-        torrents: Option<&[String]>,
+        repacker: &str,
+        torrent: &str,
     ) -> Result<(), Error> {
+        if self.is_duplicate(name, repacker, torrent)? {
+            // Если дубль, просто выходим без добавления
+            return Ok(());
+        }
+
         let id = Uuid::new_v4().to_string();
-        let torrents_str = torrents.map(|t| t.join(","));
         self.connection.execute(
-            "INSERT INTO games (id, name, torrents) VALUES (?1, ?2, ?3)",
-            params![&id, name, torrents_str],
+            "INSERT INTO torrents (id, name, repacker, torrent) VALUES (?1, ?2, ?3, ?4)",
+            params![&id, name, repacker, torrent],
         )?;
         Ok(())
     }
 
-    pub fn get_game_by_id(&self, id: &str) -> Result<Option<Game>> {
-        let mut statement = self.connection.prepare("SELECT * FROM games WHERE id = ?1")?;
+    fn is_duplicate(&self, name: &str, repacker: &str, torrent: &str) -> Result<bool, Error> {
+        let mut statement = self.connection.prepare(
+            "SELECT EXISTS(SELECT 1 FROM torrents WHERE name = ?1 AND repacker = ?2 AND torrent = ?3)"
+        )?;
+        let exists: bool = statement.query_row(params![name, repacker, torrent], |row| row.get(0))?;
+        Ok(exists)
+    }
+
+    pub fn get_torrent_by_id(&self, id: &str) -> Result<Option<Torrent>> {
+        let mut statement = self.connection.prepare("SELECT * FROM torrents WHERE id = ?1")?;
         let mut rows = statement.query(params![id])?;
         if let Some(row) = rows.next()? {
-            Ok(Some(Game {
+            Ok(Some(Torrent {
                 id: row.get(0)?,
                 name: row.get(1)?,
-                torrents: row.get::<_, Option<String>>(2)?.map(|t| t.split(',').map(String::from).collect()),
+                repacker: row.get(2)?,
+                torrent: row.get(3)?,
             }))
         } else {
             Ok(None)
         }
     }
 
-    pub fn get_all_games(&self) -> Result<Vec<Game>> {
-        let mut statement = self.connection.prepare("SELECT * FROM games")?;
+    pub fn get_all_torrents(&self) -> Result<Vec<Torrent>> {
+        let mut statement = self.connection.prepare("SELECT * FROM torrents")?;
         let rows = statement.query_map([], |row| {
-            Ok(Game {
+            Ok(Torrent {
                 id: row.get(0)?,
                 name: row.get(1)?,
-                torrents: row.get::<_, Option<String>>(2)?.map(|t| t.split(',').map(String::from).collect()),
+                repacker: row.get(2)?,
+                torrent: row.get(3)?,
             })
         })?;
         rows.collect()
     }
 
-    pub fn update_game(&self, game: &Game) -> Result<()> {
-        let torrents_str = game.torrents.as_ref().map(|t| t.join(","));
+    pub fn update_torrent(&self, torrent: &Torrent) -> Result<()> {
         self.connection.execute(
-            "UPDATE games SET name = ?1, torrents = ?2 WHERE id = ?3",
-            params![game.name, torrents_str, game.id],
+            "UPDATE torrents SET name = ?1, repacker = ?2 torrent = ?3 WHERE id = ?4",
+            params![torrent.name, torrent.repacker, torrent.torrent, torrent.id],
         )?;
         Ok(())
     }
 
-    pub fn add_torrent_to_game(&self, id: &str, torrent: &str) -> Result<()> {
-        let game = self.get_game_by_id(id)?.ok_or(rusqlite::Error::QueryReturnedNoRows)?;
-        let mut torrents = game.torrents.unwrap_or_default();
-        torrents.push(torrent.to_string());
-        self.update_game(&Game { torrents: Some(torrents), ..game })
-    }
-
-    pub fn delete_game(&self, id: &str) -> Result<()> {
-        self.connection.execute("DELETE FROM games WHERE id = ?1", params![id])?;
+    pub fn delete_torrent(&self, id: &str) -> Result<()> {
+        self.connection.execute("DELETE FROM torrents WHERE id = ?1", params![id])?;
         Ok(())
     }
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct Game {
+pub struct Torrent {
     pub id: String,
     pub name: String,
-    pub torrents: Option<Vec<String>>,
+    pub repacker: String,
+    pub torrent: String,
 }

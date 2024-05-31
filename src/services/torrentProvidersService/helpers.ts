@@ -39,10 +39,6 @@ export const getFileBuffer = async (url: string): Promise<Uint8Array> => {
   }
 }
 
-
-export const saveTorrent = (link: string, title: string) => {
-}
-
 export const requestWebPage = async (url: string): Promise<string> => {
   try {
     return await invoke<string>('fetch_web_content', { url });

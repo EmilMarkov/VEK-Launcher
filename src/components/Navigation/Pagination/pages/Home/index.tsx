@@ -1,4 +1,5 @@
-import React from 'react';
+import React, {useEffect} from 'react';
+import {gameService} from "@services/gameService/gameService";
 
 let sep: string;
 
@@ -14,6 +15,13 @@ import {
 } from './styles';
 
 const HomePage: React.FC<Props> = ({ pageName, visible }) => {
+
+    useEffect(() => {
+        gameService.getGameScreenshots(93650).then((result) => {
+            console.log(result);
+        });
+    }, []);
+
     return (
         <Container className={`app-container-column ${visible ? '' : 'hide-page'}`}>
             <section className="app-section flex-1">

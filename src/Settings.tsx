@@ -3,6 +3,7 @@ import Logo from '@assets/app_logo.png'
 
 // Default Theme
 import dark from '@styles/themes/dark'
+import {TorrentUpdateEnum} from "@/types";
 
 // App Settings
 export class Settings {
@@ -23,6 +24,8 @@ export class Settings {
     static appDeveloperEmail: string = 'mail@markov-emil.ru'
     /** Add a logo to your application, PNG or SVG. */
     static appLogo: string = Logo
+    /** How often to update the torrent list*/
+    static torrentUpdateFrequency: TorrentUpdateEnum = TorrentUpdateEnum.EVERYDAY
 
     // Left Menu
     /** Left menu toggle button icon size */

@@ -1,5 +1,5 @@
 import { JSDOM, VirtualConsole } from 'jsdom';
-import { requestWebPage, saveTorrent } from '../helpers';
+import { requestWebPage } from '../helpers';
 
 const virtualConsole = new VirtualConsole();
 

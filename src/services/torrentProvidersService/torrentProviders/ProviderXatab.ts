@@ -3,6 +3,7 @@ import async, { AsyncQueue } from 'async';
 import TorrentService from '@/services/torrentService/torrentService';
 import { formatName, getFileBuffer, requestWebPage } from '@/services/torrentProvidersService/helpers';
 import { xatabFormatter } from '@services/torrentProvidersService/formatters';
+import {repackers} from "@/constants";
 
 export class ProviderXatab {
   private torrentService = new TorrentService();
@@ -47,21 +48,22 @@ export class ProviderXatab {
     }
   }
 
-  private async addTorrentFromPage(url: string, title: string): Promise<string> {
+  private async addTorrentFromPage(url: string, name: string): Promise<void> {
     try {
       const data = await requestWebPage(url);
       const $ = cheerio.load(data);
+      const repacker = repackers.XATAB;
+      const updated = $(".entry__date").text();
       const $downloadButton = $(".download-torrent");
+
       if ($downloadButton.length === 0) {
-        console.error('Кнопка загрузки не найдена.');
-        console.log("KNOPKA: " + title + " | " + url)
         throw new Error('Кнопка загрузки не найдена');
       }
+
       const buffer = await getFileBuffer($downloadButton.attr('href')!);
-      return await this.torrentService.addTorrentByBuffer(buffer, title);
+      await this.torrentService.addTorrentByBuffer(buffer, name, repacker, updated);
     } catch (error) {
       console.error('Ошибка при добавлении торрента: ' + (error instanceof Error ? error.message : String(error)));
-      return '';
     }
   }
 
