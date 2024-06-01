@@ -13,7 +13,7 @@ edition = "2021"
 tauri-build = { version = "1.5.2", features = [] }
 
 [dependencies]
-tauri = { version = "1.6.7", features = ["macos-private-api", "os-all", "shell-open", "window-close", "window-hide", "window-maximize", "window-minimize", "window-set-title", "window-show", "window-start-dragging", "window-unmaximize", "window-unminimize"] }
+tauri = { version = "1.6.7", features = [ "os-all", "shell-open", "window-close", "window-hide", "window-maximize", "window-minimize", "window-set-title", "window-show", "window-start-dragging", "window-unmaximize", "window-unminimize"] }
 serde = { version = "1.0.202", features = ["derive"] }
 serde_json = "1.0.117"
 settimeout = "0.1.2"
@@ -27,7 +27,6 @@ devtools = "0.3.1"
 reqwest = { version = "0.12.4", features = ["json", "blocking"] }
 futures-timer = "3.0.3"
 bytes = "1.6.0"
-rusqlite = "0.31.0"
 uuid = "1.8.0"
 tokio = { version = "1.0.0", features = ["full"] }
 thiserror = "1.0.61"
@@ -38,6 +37,11 @@ hex = "0.4.3"
 url = "2.5.0"
 rs_torrent_magnet = "0.2.0"
 futures = "0.3.30"
+fake_user_agent = "0.2.1"
+
+[dependencies.rusqlite]
+version = "0.31.0"
+features = ["bundled"]
 
 
 [features]

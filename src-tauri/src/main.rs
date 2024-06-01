@@ -16,6 +16,7 @@ use crate::app_modules::provider_gog::ProviderGOG;
 use crate::app_modules::provider_kaoskrew::ProviderKaOsKrew;
 use crate::app_modules::provider_onlinefix::ProviderOnlineFix;
 use crate::app_modules::provider_tinyrepacks::ProviderTinyRepacks;
+use crate::app_modules::helpers::{get_database_path, is_database_old};
 
 #[tauri::command]
 fn fetch_web_content(url: String, _window: Window) -> Result<String, String> {
@@ -86,41 +87,46 @@ async fn main() -> Result<(), Box<dyn Error>> {
             let window = app.get_window("main").unwrap();
 
             tokio::spawn(async move {
-                let db = Arc::new(Mutex::new(Database::new().unwrap()));
-                let torrent_service = Arc::new(Mutex::new(TorrentService::new(db.clone())));
+                let db_path = get_database_path().unwrap();
+                let six_hours = Duration::from_secs(6 * 60 * 60);
 
-                let mut provider_xatab = ProviderXatab::new(torrent_service.clone());
-                let mut provider_fitgirl = ProviderFitGirl::new(torrent_service.clone());
-                let mut provider_dodi = ProviderDODI::new(torrent_service.clone());
-                let mut provider_0xempress = Provider0xEMPRESS::new(torrent_service.clone());
-                let mut provider_kaoskrew = ProviderKaOsKrew::new(torrent_service.clone());
-                let mut provider_tinyrepacks = ProviderTinyRepacks::new(torrent_service.clone());
-                let mut provider_gog = ProviderGOG::new(torrent_service.clone());
-                let mut provider_onlinefix = ProviderOnlineFix::new(torrent_service.clone());
+                if is_database_old(&db_path, six_hours) {
+                    let db = Arc::new(Mutex::new(Database::new().unwrap()));
+                    let torrent_service = Arc::new(Mutex::new(TorrentService::new(db.clone())));
 
-                update_status(window.clone(), "Инициализация Xatab".into()).await;
-                provider_xatab.init_scraping().await.unwrap();
+                    let mut provider_xatab = ProviderXatab::new(torrent_service.clone());
+                    let mut provider_fitgirl = ProviderFitGirl::new(torrent_service.clone());
+                    let mut provider_dodi = ProviderDODI::new(torrent_service.clone());
+                    let mut provider_0xempress = Provider0xEMPRESS::new(torrent_service.clone());
+                    let mut provider_kaoskrew = ProviderKaOsKrew::new(torrent_service.clone());
+                    let mut provider_tinyrepacks = ProviderTinyRepacks::new(torrent_service.clone());
+                    let mut provider_gog = ProviderGOG::new(torrent_service.clone());
+                    let mut provider_onlinefix = ProviderOnlineFix::new(torrent_service.clone());
 
-                update_status(window.clone(), "Инициализация FitGirl".into()).await;
-                provider_fitgirl.init_scraping().await.unwrap();
+                    update_status(window.clone(), "Инициализация Xatab".into()).await;
+                    provider_xatab.init_scraping().await.unwrap();
 
-                update_status(window.clone(), "Инициализация DODI".into()).await;
-                provider_dodi.init_scraping().await.unwrap();
+                    update_status(window.clone(), "Инициализация FitGirl".into()).await;
+                    provider_fitgirl.init_scraping().await.unwrap();
 
-                update_status(window.clone(), "Инициализация 0xEMPRESS".into()).await;
-                provider_0xempress.init_scraping().await.unwrap();
+                    update_status(window.clone(), "Инициализация DODI".into()).await;
+                    provider_dodi.init_scraping().await.unwrap();
 
-                update_status(window.clone(), "Инициализация KaOsKrew".into()).await;
-                provider_kaoskrew.init_scraping().await.unwrap();
+                    update_status(window.clone(), "Инициализация 0xEMPRESS".into()).await;
+                    provider_0xempress.init_scraping().await.unwrap();
 
-                update_status(window.clone(), "Инициализация TinyRepacks".into()).await;
-                provider_tinyrepacks.init_scraping().await.unwrap();
+                    update_status(window.clone(), "Инициализация KaOsKrew".into()).await;
+                    provider_kaoskrew.init_scraping().await.unwrap();
 
-                update_status(window.clone(), "Инициализация GOG".into()).await;
-                provider_gog.init_scraping().await.unwrap();
+                    update_status(window.clone(), "Инициализация TinyRepacks".into()).await;
+                    provider_tinyrepacks.init_scraping().await.unwrap();
 
-                update_status(window.clone(), "Инициализация Online-Fix".into()).await;
-                provider_onlinefix.init_scraping().await.unwrap();
+                    update_status(window.clone(), "Инициализация GOG".into()).await;
+                    provider_gog.init_scraping().await.unwrap();
+
+                    update_status(window.clone(), "Инициализация Online-Fix".into()).await;
+                    provider_onlinefix.init_scraping().await.unwrap();
+                }
 
                 close_splashscreen(window);
             });

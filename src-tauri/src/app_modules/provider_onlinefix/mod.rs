@@ -4,8 +4,9 @@ use reqwest::Client;
 use scraper::{Html, Selector};
 use std::sync::Arc;
 use tokio::sync::{mpsc, Mutex};
-use crate::app_modules::formatters::{onlinefix_formatter, tinyrepacks_formatter};
+use crate::app_modules::formatters::onlinefix_formatter;
 use crate::app_modules::helpers::format_name;
+use fake_user_agent::get_rua;
 
 pub struct ProviderOnlineFix {
     service: Arc<Mutex<TorrentService>>,
@@ -124,8 +125,11 @@ impl ProviderOnlineFix {
     }
 
     async fn fetch_web_content(&self, url: &str) -> Result<String, String> {
+        let user_agent = get_rua();
+        
         self.client
             .get(url)
+            .header("User-Agent", user_agent)
             .send()
             .await
             .map_err(|e| format!("Ошибка HTTP запроса: {}", e))?

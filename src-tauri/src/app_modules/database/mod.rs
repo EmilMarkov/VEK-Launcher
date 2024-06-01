@@ -2,9 +2,8 @@ use rusqlite::{params, Connection, Result};
 use serde::{Serialize, Deserialize};
 use rusqlite::Error;
 use uuid::Uuid;
-use std::path::{PathBuf};
-use std::fs;
-use dirs;
+
+use crate::app_modules::helpers::get_database_path;
 
 #[derive(Debug)]
 pub struct Database {
@@ -13,7 +12,7 @@ pub struct Database {
 
 impl Database {
     pub fn new() -> Result<Self, Error> {
-        let db_path = Self::get_database_path()?;
+        let db_path = get_database_path()?;
         match Connection::open(&db_path) {
             Ok(connection) => {
                 match connection.execute(
@@ -31,22 +30,6 @@ impl Database {
             },
             Err(err) => Err(err.into()),
         }
-    }
-
-    fn get_database_path() -> Result<PathBuf, Error> {
-        let mut path = dirs::data_local_dir().ok_or_else(|| {
-            rusqlite::Error::InvalidPath("Could not determine local data directory".into())
-        })?;
-
-        path.push("VEKLauncher");
-        if !path.exists() {
-            fs::create_dir_all(&path).map_err(|e| {
-                rusqlite::Error::InvalidPath(format!("Could not create directory: {}", e).into())
-            })?;
-        }
-
-        path.push("veklauncher.db");
-        Ok(path)
     }
 
     pub fn add_torrent(
