@@ -28,7 +28,7 @@ const AboutPage: React.FC<Props> = ({pageName, visible})=>{
                     </div>
                     <div className='row app-info-box'>
                         <div className='left'>framework:</div>
-                        <div className='right'>Tauri 1.4 with React</div>
+                        <div className='right'>Tauri 1.6 with React</div>
                     </div>
                     <div className='row app-info-box'>
                         <div className='left'>languages:</div>

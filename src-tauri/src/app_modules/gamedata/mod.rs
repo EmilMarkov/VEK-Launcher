@@ -1,18 +1,20 @@
 use reqwest;
 use serde_json::Value;
-use reqwest::StatusCode;
 use std::error::Error;
 use std::fmt;
 use lazy_static::lazy_static;
 use regex::Regex;
 use std::sync::Mutex;
+use fake_user_agent::get_rua;
+use reqwest::{Client, StatusCode};
+use reqwest::header::{HeaderValue};
 
 lazy_static! {
     static ref API_KEY: Mutex<String> = Mutex::new(String::new());
 }
 
 const BASE_URL: &str = "https://api.rawg.io/api/";
-const PAGE_SIZE: usize = 200;
+const PAGE_SIZE: usize = 10;
 const PLAY_ON_DESKTOP: bool = true;
 
 #[derive(Debug)]
@@ -47,7 +49,17 @@ impl From<reqwest::Error> for ApiError {
 }
 
 async fn get(url: &str, retry: bool) -> Result<Value, Box<dyn Error>> {
-    let resp = reqwest::get(url).await.map_err(ApiError::from)?;
+    let user_agent = get_rua();
+    let client = Client::builder()
+        .user_agent(user_agent.clone())
+        .build()
+        .map_err(ApiError::from)?;
+
+    let resp = client.get(url)
+        .header("X-Api-Client", "website")
+        .send()
+        .await
+        .map_err(ApiError::from)?;
     let status = resp.status();
     let body = resp.text().await.map_err(ApiError::from)?;
 
@@ -58,7 +70,16 @@ async fn get(url: &str, retry: bool) -> Result<Value, Box<dyn Error>> {
         StatusCode::UNAUTHORIZED => {
             if retry {
                 update_api_key().await?;
-                let new_resp = reqwest::get(url).await.map_err(ApiError::from)?;
+                let new_user_agent = get_rua();
+                let new_client = Client::builder()
+                    .user_agent(new_user_agent)
+                    .build()
+                    .map_err(ApiError::from)?;
+                let new_resp = new_client.get(url)
+                    .header("X-Api-Client", "website")
+                    .send()
+                    .await
+                    .map_err(ApiError::from)?;
                 let new_status = new_resp.status();
                 let new_body = new_resp.text().await.map_err(ApiError::from)?;
                 if new_status == StatusCode::OK {

@@ -1,34 +1,70 @@
-import React, {useEffect} from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { gameService } from '@services/gameService/gameService';
+import { Container, CardsContainer, NavigationButtons } from './styles';
+import GameCard from '@/components/UIElements/games/GameCard';
 
-let sep: string;
+const HomePage: React.FC = () => {
+    const [games, setGames] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [nextPage, setNextPage] = useState<string | null>(null);
+    const [prevPage, setPrevPage] = useState<string | null>(null);
+    const [cache, setCache] = useState<{ [key: string]: any }>({});
 
-if (navigator.appVersion.indexOf('Win') !== -1) {
-    sep = '\\';
-} else {
-    sep = '/';
-}
+    const fetchGames = async (page?: number, next?: string) => {
+        setLoading(true);
+        const cacheKey = next || `page-${page}`;
 
-import {
-    Container,
-    Props,
-} from './styles';
-import { providerOnlineFix } from '@/services/torrentProvidersService/torrentProviders/ProviderOnlineFix';
-
-const HomePage: React.FC<Props> = ({ pageName, visible }) => {
+        if (cache[cacheKey]) {
+            const data = cache[cacheKey];
+            setGames(data.results);
+            setNextPage(data.next);
+            setPrevPage(data.previous);
+            setLoading(false);
+        } else {
+            try {
+                const data = next ? await gameService.getGameList(undefined, next) : await gameService.getGameList(page);
+                setCache(prevCache => ({ ...prevCache, [cacheKey]: data }));
+                setGames(data.results);
+                setNextPage(data.next);
+                setPrevPage(data.previous);
+                setLoading(false);
+                console.log("Загрузка");
+            } catch (error) {
+                console.error('Failed to fetch games:', error);
+                setLoading(false);
+            }
+        }
+    };
 
     useEffect(() => {
-        providerOnlineFix.fetchTorrentInfo("https://online-fix.me/games/officialservers/17514-ghost-of-tsushima-directors-cut-po-seti.html").then((result) => {
-            console.log(result);
-        });
+        fetchGames(1);
     }, []);
 
-    return (
-        <Container className={`app-container-column ${visible ? '' : 'hide-page'}`}>
-            <section className="app-section flex-1">
-                <ul style={{ width: '100%', height: '100%' }}>
+    const gameCards = useMemo(
+        () => games.map(game => (
+            <GameCard
+                key={game["id"]}
+                backgroundImage={game["background_image"]}
+                name={game["name"]}
+                rating={game["rating"]}
+            />
+        )),
+        [games]
+    );
 
-                </ul>
-            </section>
+    return (
+        <Container>
+            <CardsContainer className={!loading ? 'loaded' : ''}>
+                {gameCards}
+            </CardsContainer>
+            <NavigationButtons>
+                <button onClick={() => prevPage && fetchGames(undefined, prevPage)} disabled={!prevPage}>
+                    Previous
+                </button>
+                <button onClick={() => nextPage && fetchGames(undefined, nextPage)} disabled={!nextPage}>
+                    Next
+                </button>
+            </NavigationButtons>
         </Container>
     );
 };

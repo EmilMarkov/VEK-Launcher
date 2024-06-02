@@ -9,54 +9,16 @@ mod app_modules;
 use app_modules::database::Database;
 use app_modules::torrent_service::TorrentService;
 use app_modules::provider_xatab::ProviderXatab;
-use crate::app_modules::provider_0xempress::{Provider0xEMPRESS, get_torrent_info_0xempress};
-use crate::app_modules::provider_dodi::{ProviderDODI, get_torrent_info_dodi};
-use crate::app_modules::provider_fitgirl::{ProviderFitGirl, get_torrent_info_fitgirl};
-use crate::app_modules::provider_gog::{ProviderGOG, get_torrent_info_gog};
-use crate::app_modules::provider_kaoskrew::{ProviderKaOsKrew, get_torrent_info_kaoskrew};
-use crate::app_modules::provider_onlinefix::{ProviderOnlineFix, get_torrent_info_onlinefix};
-use crate::app_modules::provider_tinyrepacks::{ProviderTinyRepacks, get_torrent_info_tinyrepacks};
-use crate::app_modules::helpers::{get_database_path, is_database_old};
+use app_modules::gamedata::{get_game_list, update_api_key};
+use app_modules::provider_0xempress::{Provider0xEMPRESS, get_torrent_info_0xempress};
+use app_modules::provider_dodi::{ProviderDODI, get_torrent_info_dodi};
+use app_modules::provider_fitgirl::{ProviderFitGirl, get_torrent_info_fitgirl};
+use app_modules::provider_gog::{ProviderGOG, get_torrent_info_gog};
+use app_modules::provider_kaoskrew::{ProviderKaOsKrew, get_torrent_info_kaoskrew};
+use app_modules::provider_onlinefix::{ProviderOnlineFix, get_torrent_info_onlinefix};
+use app_modules::provider_tinyrepacks::{ProviderTinyRepacks, get_torrent_info_tinyrepacks};
+use app_modules::helpers::{get_database_path, is_database_old};
 
-#[tauri::command]
-fn fetch_web_content(url: String, _window: Window) -> Result<String, String> {
-    let client = reqwest::blocking::Client::new();
-    let response = client.get(&url).send();
-
-    match response {
-        Ok(res) => {
-            if res.status().is_success() {
-                match res.text() {
-                    Ok(text) => Ok(text),
-                    Err(_) => Err("Failed to read response text".into())
-                }
-            } else {
-                Err(format!("HTTP error: {}", res.status()))
-            }
-        },
-        Err(e) => Err(format!("Failed to fetch URL: {}", e)),
-    }
-}
-
-#[tauri::command]
-fn fetch_file_buffer(url: String, _window: Window) -> Result<Vec<u8>, String> {
-    let client = reqwest::blocking::Client::new();
-    let response = client.get(&url).send();
-
-    match response {
-        Ok(res) => {
-            if res.status().is_success() {
-                match res.bytes() {
-                    Ok(bytes) => Ok(bytes.to_vec()),
-                    Err(_) => Err("Failed to read response data".into())
-                }
-            } else {
-                Err(format!("HTTP error: {}", res.status()))
-            }
-        },
-        Err(e) => Err(format!("Failed to fetch URL: {}", e)),
-    }
-}
 
 #[tauri::command]
 fn close_splashscreen(window: Window) {
@@ -79,9 +41,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             close_splashscreen,
-            fetch_web_content,
-            fetch_file_buffer,
             update_status,
+            get_game_list,
             get_torrent_info_0xempress,
             get_torrent_info_dodi,
             get_torrent_info_fitgirl,
@@ -97,10 +58,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 let db_path = get_database_path().unwrap();
                 let six_hours = Duration::from_secs(6 * 60 * 60);
 
+                update_api_key().await.unwrap();
+
                 if is_database_old(&db_path, six_hours) {
                     let db = Arc::new(Mutex::new(Database::new().unwrap()));
                     let torrent_service = Arc::new(Mutex::new(TorrentService::new(db.clone())));
-    
                     let mut provider_xatab = ProviderXatab::new(torrent_service.clone());
                     let mut provider_fitgirl = ProviderFitGirl::new(torrent_service.clone());
                     let mut provider_dodi = ProviderDODI::new(torrent_service.clone());
@@ -109,8 +71,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
                     let mut provider_tinyrepacks = ProviderTinyRepacks::new(torrent_service.clone());
                     let mut provider_gog = ProviderGOG::new(torrent_service.clone());
                     let mut provider_onlinefix = ProviderOnlineFix::new(torrent_service.clone());
-    
-                    provider_onlinefix.authenticate().await.unwrap();
 
                     update_status(window.clone(), "Инициализация Xatab".into()).await;
                     provider_xatab.init_scraping().await.unwrap();
