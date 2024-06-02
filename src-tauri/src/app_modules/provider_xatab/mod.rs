@@ -7,6 +7,8 @@ use tokio::sync::{mpsc, Mutex};
 use crate::app_modules::formatters::xatab_formatter;
 use crate::app_modules::helpers::format_name;
 use fake_user_agent::get_rua;
+use std::str;
+use rs_torrent_magnet::magnet_from_torrent;
 
 pub struct ProviderXatab {
     service: Arc<Mutex<TorrentService>>,
@@ -119,6 +121,57 @@ impl ProviderXatab {
             Err(error) => {
                 println!("Ошибка при обработке страницы {}: {}", page, error);
             }
+        }
+    }
+
+    pub async fn get_torrent_info(&self, url: &str) -> Result<(String, String), String> {
+        let data = self.fetch_web_content(url).await?;
+        let (updated, download_url) = self.parse_torrent_info(&data)?;
+        let buffer = self.fetch_file_buffer(download_url).await?;
+        let magnet = self.extract_magnet_link(buffer)?;
+
+        Ok((updated, magnet))
+    }
+
+    fn parse_torrent_info(&self, data: &str) -> Result<(String, String), String> {
+        let document = Html::parse_document(data);
+        let date_selector = Selector::parse(".entry__date").unwrap();
+        let magnet_selector = Selector::parse(".download-torrent").unwrap();
+
+        let updated = document.select(&date_selector)
+            .next()
+            .map(|element| element.text().collect::<Vec<_>>().join(""))
+            .unwrap_or_else(|| "Unknown".to_string());
+
+        let download_url = document.select(&magnet_selector)
+            .next()
+            .map(|element| element.value().attr("href").unwrap().to_string())
+            .unwrap_or_else(|| "No download link found".to_string());
+
+        Ok((updated, download_url))
+    }
+
+    fn extract_magnet_link(&self, buffer: Vec<u8>) -> Result<String, String> {
+        let magnet_link = magnet_from_torrent(buffer);
+        Ok(magnet_link)
+    }
+
+    async fn fetch_file_buffer(&self, url: String) -> Result<Vec<u8>, String> {
+        let client = reqwest::Client::new();
+        let response = client.get(&url).send().await;
+
+        match response {
+            Ok(res) => {
+                if res.status().is_success() {
+                    match res.bytes().await {
+                        Ok(bytes) => Ok(bytes.to_vec()),
+                        Err(_) => Err("Failed to read response data".into())
+                    }
+                } else {
+                    Err(format!("HTTP error: {}", res.status()))
+                }
+            },
+            Err(e) => Err(format!("Failed to fetch URL: {}", e)),
         }
     }
 

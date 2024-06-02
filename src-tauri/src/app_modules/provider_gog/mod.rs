@@ -7,6 +7,9 @@ use tokio::sync::Mutex;
 use crate::app_modules::formatters::gog_formatter;
 use crate::app_modules::helpers::format_name;
 use fake_user_agent::get_rua;
+use base64::engine::general_purpose;
+use base64::Engine as _;
+use std::str;
 
 pub struct ProviderGOG {
     service: Arc<Mutex<TorrentService>>,
@@ -64,6 +67,45 @@ impl ProviderGOG {
             }
             Err(error) => {
                 println!("Ошибка при обработке страницы: {}", error);
+                Err(error)
+            }
+        }
+    }
+
+    pub async fn get_torrent_info(&self, url: &str) -> Result<(String, String), String> {
+        match self.fetch_web_content(url).await {
+            Ok(data) => {
+                let document = Html::parse_document(&data);
+                let date_selector = Selector::parse("[property=\"article:modified_time\"]").unwrap();
+                let magnet_selector = Selector::parse(".download-btn:not(.lightweight-accordion *)").unwrap();
+
+                let updated = document.select(&date_selector)
+                    .next()
+                    .map(|element| element.text().collect::<Vec<_>>().join(""))
+                    .unwrap_or_else(|| "Unknown".to_string());
+
+                let magnet_link = document.select(&magnet_selector)
+                    .next()
+                    .and_then(|element| element.value().attr("href"))
+                    .unwrap_or_else(|| "No magnet link found");
+
+                let magnet = if let Some(start) = magnet_link.find("url=") {
+                    let encoded = &magnet_link[start + 4..];
+                    match general_purpose::STANDARD.decode(encoded) {
+                        Ok(bytes) => match str::from_utf8(&bytes) {
+                            Ok(decoded) => decoded.to_string(),
+                            Err(_) => "Invalid UTF-8 sequence".to_string(),
+                        },
+                        Err(_) => "Failed to decode Base64".to_string(),
+                    }
+                } else {
+                    "No magnet link found".to_string()
+                };
+
+                Ok((updated, magnet))
+            },
+            Err(error) => {
+                println!("Ошибка при получении информации о торренте {}: {}", url, error);
                 Err(error)
             }
         }

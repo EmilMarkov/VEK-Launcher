@@ -122,6 +122,41 @@ impl ProviderKaOsKrew {
         }
     }
 
+    pub async fn get_torrent_info(&self, url: &str) -> Result<(String, String), String> {
+        match self.fetch_web_content(url).await {
+            Ok(data) => {
+                let document = Html::parse_document(&data);
+                let list_selector = Selector::parse("ul.list > li").unwrap();
+                let magnet_selector = Selector::parse("a[href^='magnet:']").unwrap();
+    
+                let updated = document.select(&list_selector)
+                    .filter_map(|element| {
+                        let text = element.text().collect::<Vec<_>>().join("");
+                        if text.contains("Last checked") {
+                            element.select(&Selector::parse("span").unwrap())
+                                .next()
+                                .map(|e| e.text().collect::<Vec<_>>().join(""))
+                        } else {
+                            None
+                        }
+                    })
+                    .next()
+                    .unwrap_or_else(|| "Unknown".to_string());
+    
+                let magnet = document.select(&magnet_selector)
+                    .next()
+                    .and_then(|element| element.value().attr("href").map(|s| s.to_string()))
+                    .unwrap_or_else(|| "No magnet link found".to_string());
+    
+                Ok((updated, magnet))
+            },
+            Err(error) => {
+                println!("Ошибка при получении информации о торренте {}: {}", url, error);
+                Err(error)
+            }
+        }
+    }
+
     async fn fetch_web_content(&self, url: &str) -> Result<String, String> {
         let user_agent = get_rua();
         

@@ -103,6 +103,18 @@ async fn main() -> Result<(), Box<dyn Error>> {
                     let mut provider_gog = ProviderGOG::new(torrent_service.clone());
                     let mut provider_onlinefix = ProviderOnlineFix::new(torrent_service.clone());
 
+                    provider_onlinefix.authenticate().await.unwrap();
+
+                    match provider_onlinefix.get_torrent_info("https://online-fix.me/games/adventures/17512-spanky-po-seti.html").await {
+                        Ok((updated, magnet)) => {
+                            println!("Дата обновления: {}", updated);
+                            println!("Magnet ссылка: {}", magnet);
+                        },
+                        Err(e) => {
+                            println!("Ошибка: {}", e);
+                        }
+                    }
+
                     update_status(window.clone(), "Инициализация Xatab".into()).await;
                     provider_xatab.init_scraping().await.unwrap();
 
