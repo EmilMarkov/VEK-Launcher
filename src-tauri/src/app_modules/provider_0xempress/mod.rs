@@ -2,11 +2,14 @@ use crate::app_modules::torrent_service::TorrentService;
 use crate::app_modules::database::Torrent;
 use reqwest::Client;
 use scraper::{Html, Selector};
+use tauri::Window;
 use std::sync::Arc;
 use tokio::sync::{mpsc, Mutex};
 use crate::app_modules::formatters::empress_formatter;
 use crate::app_modules::helpers::format_name;
 use fake_user_agent::get_rua;
+
+use crate::app_modules::database::Database;
 
 pub struct Provider0xEMPRESS {
     service: Arc<Mutex<TorrentService>>,
@@ -28,9 +31,17 @@ impl Provider0xEMPRESS {
     }
 
     pub async fn init_scraping(&mut self) -> Result<(), String> {
-        self.total_pages = self.get_total_pages().await?;
-        self.collect_pages(self.total_pages);
-        Ok(())
+        match self.get_total_pages().await {
+            Ok(total_pages) => {
+                self.total_pages = total_pages;
+                self.collect_pages(self.total_pages);
+                Ok(())
+            }
+            Err(e) => {
+                println!("Error getting total pages: {}", e);
+                Ok(()) // Продолжаем выполнение даже при ошибке
+            }
+        }
     }
 
     async fn get_total_pages(&self) -> Result<u32, String> {
@@ -74,18 +85,21 @@ impl Provider0xEMPRESS {
                         processed_pages: 0,
                         max_page_in_queue: 0,
                     };
-                    provider.process_page(page).await;
+                    match provider.process_page(page).await {
+                        Ok(_) => {}
+                        Err(e) => println!("Error processing page {}: {}", page, e),
+                    }
                 });
             }
         });
     }
 
-    async fn process_page(&mut self, page: u32) {
+    async fn process_page(&mut self, page: u32) -> Result<(), String> {
         let url = format!("https://www.1337xx.to/user/0xEMPRESS/{}", page);
         match self.fetch_web_content(&url).await {
             Ok(data) => {
                 if data.len() < 100 {
-                    return;
+                    return Ok(());
                 }
 
                 let document = Html::parse_document(&data);
@@ -115,9 +129,11 @@ impl Provider0xEMPRESS {
                 }
 
                 self.processed_pages += 1;
+                Ok(())
             }
             Err(error) => {
                 println!("Ошибка при обработке страницы {}: {}", page, error);
+                Err(error)
             }
         }
     }
@@ -170,4 +186,13 @@ impl Provider0xEMPRESS {
             .await
             .map_err(|e| format!("Ошибка чтения текста ответа: {}", e))
     }
+}
+
+#[tauri::command]
+pub async fn get_torrent_info_0xempress(url: String, window: Window) -> Result<(String, String), String> {
+    let db = Arc::new(Mutex::new(Database::new().unwrap()));
+    let torrent_service = Arc::new(Mutex::new(TorrentService::new(db.clone())));
+    
+    let provider = Provider0xEMPRESS::new(torrent_service);
+    provider.get_torrent_info(&url).await
 }

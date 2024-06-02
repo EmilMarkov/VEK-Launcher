@@ -2,6 +2,7 @@ use crate::app_modules::torrent_service::TorrentService;
 use crate::app_modules::database::Torrent;
 use reqwest::Client;
 use scraper::{Html, Selector};
+use tauri::Window;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 use crate::app_modules::formatters::gog_formatter;
@@ -10,6 +11,8 @@ use fake_user_agent::get_rua;
 use base64::engine::general_purpose;
 use base64::Engine as _;
 use std::str;
+
+use crate::app_modules::database::Database;
 
 pub struct ProviderGOG {
     service: Arc<Mutex<TorrentService>>,
@@ -25,8 +28,13 @@ impl ProviderGOG {
     }
 
     pub async fn init_scraping(&self) -> Result<(), String> {
-        self.process_page().await?;
-        Ok(())
+        match self.process_page().await {
+            Ok(_) => Ok(()),
+            Err(e) => {
+                println!("Error during scraping: {}", e);
+                Ok(())
+            }
+        }
     }
 
     async fn process_page(&self) -> Result<(), String> {
@@ -124,4 +132,13 @@ impl ProviderGOG {
             .await
             .map_err(|e| format!("Ошибка чтения текста ответа: {}", e))
     }
+}
+
+#[tauri::command]
+pub async fn get_torrent_info_gog(url: String, window: Window) -> Result<(String, String), String> {
+    let db = Arc::new(Mutex::new(Database::new().unwrap()));
+    let torrent_service = Arc::new(Mutex::new(TorrentService::new(db.clone())));
+    
+    let provider = ProviderGOG::new(torrent_service);
+    provider.get_torrent_info(&url).await
 }

@@ -12,3 +12,8 @@ export enum TorrentUpdateEnum {
     'EVERYDAY',
     'EVERYWEEK'
 }
+
+export interface TorrentInfo {
+    updated: string;
+    magnet: string;
+}

@@ -2,6 +2,7 @@ use crate::app_modules::torrent_service::TorrentService;
 use crate::app_modules::database::Torrent;
 use reqwest::{Client, header::HeaderValue};
 use scraper::{Html, Selector};
+use tauri::Window;
 use std::sync::Arc;
 use tokio::sync::{mpsc, Mutex};
 use crate::app_modules::formatters::onlinefix_formatter;
@@ -12,6 +13,8 @@ use rs_torrent_magnet::magnet_from_torrent;
 use serde_json::Value;
 use dotenv::dotenv;
 use std::env;
+
+use crate::app_modules::database::Database;
 
 pub struct ProviderOnlineFix {
     service: Arc<Mutex<TorrentService>>,
@@ -41,9 +44,17 @@ impl ProviderOnlineFix {
     }
 
     pub async fn init_scraping(&mut self) -> Result<(), String> {
-        self.total_pages = self.get_total_pages().await?;
-        self.collect_pages(self.total_pages);
-        Ok(())
+        match self.get_total_pages().await {
+            Ok(total_pages) => {
+                self.total_pages = total_pages;
+                self.collect_pages(self.total_pages).await;
+                Ok(())
+            },
+            Err(e) => {
+                println!("Error getting total pages: {}", e);
+                Ok(())  // Продолжаем выполнение даже при ошибке
+            }
+        }
     }
 
     pub async fn authenticate(&self) -> Result<(), String> {
@@ -106,7 +117,7 @@ impl ProviderOnlineFix {
         Ok(total_pages)
     }
 
-    fn collect_pages(&mut self, up_to_page: u32) {
+    async fn collect_pages(&mut self, up_to_page: u32) {
         let (tx, mut rx) = mpsc::channel(10);
 
         for page in (self.max_page_in_queue + 1)..=up_to_page {
@@ -133,18 +144,21 @@ impl ProviderOnlineFix {
                         processed_pages: 0,
                         max_page_in_queue: 0,
                     };
-                    provider.process_page(page).await;
+                    match provider.process_page(page).await {
+                        Ok(_) => {},
+                        Err(e) => println!("Error processing page {}: {}", page, e),
+                    }
                 });
             }
         });
     }
 
-    async fn process_page(&mut self, page: u32) {
+    async fn process_page(&mut self, page: u32) -> Result<(), String> {
         let url = format!("https://online-fix.me/page/{}", page);
         match self.fetch_web_content(&url, "https://online-fix.me/").await {
             Ok(data) => {
                 if data.len() < 100 {
-                    return;
+                    return Ok(());
                 }
 
                 let document = Html::parse_document(&data);
@@ -176,9 +190,11 @@ impl ProviderOnlineFix {
                 }
 
                 self.processed_pages += 1;
+                Ok(())
             }
             Err(error) => {
                 println!("Ошибка при обработке страницы {}: {}", page, error);
+                Err(error)
             }
         }
     }
@@ -286,4 +302,15 @@ impl ProviderOnlineFix {
         }
         cookies
     }
+}
+
+#[tauri::command]
+pub async fn get_torrent_info_onlinefix(url: String, window: Window) -> Result<(String, String), String> {
+    let db = Arc::new(Mutex::new(Database::new().unwrap()));
+    let torrent_service = Arc::new(Mutex::new(TorrentService::new(db.clone())));
+    
+    let provider = ProviderOnlineFix::new(torrent_service);
+    provider.authenticate().await.unwrap();
+
+    provider.get_torrent_info(&url).await
 }

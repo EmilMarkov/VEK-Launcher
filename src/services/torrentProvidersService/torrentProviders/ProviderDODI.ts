@@ -2,10 +2,10 @@ import { TorrentInfo } from "@/types";
 import { invoke } from "@tauri-apps/api";
 
 
-class ProviderGOG{
+class ProviderDODI{
   async fetchTorrentInfo(url: string): Promise<TorrentInfo> {
     try {
-        const response = await invoke<TorrentInfo>('get_torrent_info_gog', {
+        const response = await invoke<TorrentInfo>('get_torrent_info_dodi', {
             url: url
         });
         return response;
@@ -16,4 +16,4 @@ class ProviderGOG{
   }
 }
 
-export const providerGOG = new ProviderGOG();
+export const providerDODI = new ProviderDODI();

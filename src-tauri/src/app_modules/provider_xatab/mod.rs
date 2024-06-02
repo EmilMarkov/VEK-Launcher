@@ -2,6 +2,7 @@ use crate::app_modules::torrent_service::TorrentService;
 use crate::app_modules::database::Torrent;
 use reqwest::Client;
 use scraper::{Html, Selector};
+use tauri::Window;
 use std::sync::Arc;
 use tokio::sync::{mpsc, Mutex};
 use crate::app_modules::formatters::xatab_formatter;
@@ -9,6 +10,8 @@ use crate::app_modules::helpers::format_name;
 use fake_user_agent::get_rua;
 use std::str;
 use rs_torrent_magnet::magnet_from_torrent;
+
+use crate::app_modules::database::Database;
 
 pub struct ProviderXatab {
     service: Arc<Mutex<TorrentService>>,
@@ -30,9 +33,17 @@ impl ProviderXatab {
     }
 
     pub async fn init_scraping(&mut self) -> Result<(), String> {
-        self.total_pages = self.get_total_pages().await?;
-        self.collect_pages(self.total_pages);
-        Ok(())
+        match self.get_total_pages().await {
+            Ok(total_pages) => {
+                self.total_pages = total_pages;
+                self.collect_pages(self.total_pages).await;
+                Ok(())
+            }
+            Err(e) => {
+                println!("Error getting total pages: {}", e);
+                Ok(()) // Продолжаем выполнение даже при ошибке
+            }
+        }
     }
 
     async fn get_total_pages(&self) -> Result<u32, String> {
@@ -50,7 +61,7 @@ impl ProviderXatab {
         Ok(total_pages)
     }
 
-    fn collect_pages(&mut self, up_to_page: u32) {
+    async fn collect_pages(&mut self, up_to_page: u32) {
         let (tx, mut rx) = mpsc::channel(10);
 
         for page in (self.max_page_in_queue + 1)..=up_to_page {
@@ -76,18 +87,21 @@ impl ProviderXatab {
                         processed_pages: 0,
                         max_page_in_queue: 0,
                     };
-                    provider.process_page(page).await;
+                    match provider.process_page(page).await {
+                        Ok(_) => {}
+                        Err(e) => println!("Error processing page {}: {}", page, e),
+                    }
                 });
             }
         });
     }
 
-    async fn process_page(&mut self, page: u32) {
+    async fn process_page(&mut self, page: u32) -> Result<(), String> {
         let url = format!("https://byxatab.com/page/{}", page);
         match self.fetch_web_content(&url).await {
             Ok(data) => {
                 if data.len() < 100 {
-                    return;
+                    return Ok(());
                 }
 
                 let document = Html::parse_document(&data);
@@ -117,9 +131,11 @@ impl ProviderXatab {
                 }
 
                 self.processed_pages += 1;
+                Ok(())
             }
             Err(error) => {
                 println!("Ошибка при обработке страницы {}: {}", page, error);
+                Err(error)
             }
         }
     }
@@ -128,9 +144,13 @@ impl ProviderXatab {
         let data = self.fetch_web_content(url).await?;
         let (updated, download_url) = self.parse_torrent_info(&data)?;
         let buffer = self.fetch_file_buffer(download_url).await?;
-        let magnet = self.extract_magnet_link(buffer)?;
-
-        Ok((updated, magnet))
+        match self.extract_magnet_link(buffer) {
+            Ok(magnet) => Ok((updated, magnet)),
+            Err(e) => {
+                println!("Error extracting magnet link: {}", e);
+                Err(e)
+            }
+        }
     }
 
     fn parse_torrent_info(&self, data: &str) -> Result<(String, String), String> {
@@ -165,7 +185,7 @@ impl ProviderXatab {
                 if res.status().is_success() {
                     match res.bytes().await {
                         Ok(bytes) => Ok(bytes.to_vec()),
-                        Err(_) => Err("Failed to read response data".into())
+                        Err(e) => Err(format!("Failed to read response data: {}", e))
                     }
                 } else {
                     Err(format!("HTTP error: {}", res.status()))
@@ -188,4 +208,13 @@ impl ProviderXatab {
             .await
             .map_err(|e| format!("Ошибка чтения текста ответа: {}", e))
     }
+}
+
+#[tauri::command]
+pub async fn get_torrent_info_xatab(url: String, window: Window) -> Result<(String, String), String> {
+    let db = Arc::new(Mutex::new(Database::new().unwrap()));
+    let torrent_service = Arc::new(Mutex::new(TorrentService::new(db.clone())));
+    
+    let provider = ProviderXatab::new(torrent_service);
+    provider.get_torrent_info(&url).await
 }

@@ -1,13 +1,19 @@
-import { JSDOM } from 'jsdom';
-import {requestWebPage} from "@services/torrentProvidersService/helpers";
+import { TorrentInfo } from "@/types";
+import { invoke } from "@tauri-apps/api";
 
-export class ProviderOnlineFix {
-  async request(path: string): Promise<any> {
-    return requestWebPage(`https://online-fix.me${path}`);
-  }
 
-  async getTorrents(existingTorrents: string[] = [], page = 1): Promise<string[]> {
-    const torrents: string[] = [];
-    return torrents;
+class ProviderOnlineFix{
+  async fetchTorrentInfo(url: string): Promise<TorrentInfo> {
+    try {
+        const response = await invoke<TorrentInfo>('get_torrent_info_onlinefix', {
+            url: url
+        });
+        return response;
+    } catch (error) {
+        console.error('Torrent get info error:', error);
+        throw error;
+    }
   }
 }
+
+export const providerOnlineFix = new ProviderOnlineFix();

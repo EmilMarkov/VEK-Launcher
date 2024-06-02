@@ -1,5 +1,4 @@
 import React, {useEffect} from 'react';
-import {gameService} from "@services/gameService/gameService";
 
 let sep: string;
 
@@ -13,11 +12,12 @@ import {
     Container,
     Props,
 } from './styles';
+import { providerOnlineFix } from '@/services/torrentProvidersService/torrentProviders/ProviderOnlineFix';
 
 const HomePage: React.FC<Props> = ({ pageName, visible }) => {
 
     useEffect(() => {
-        gameService.getGameScreenshots(93650).then((result) => {
+        providerOnlineFix.fetchTorrentInfo("https://online-fix.me/games/officialservers/17514-ghost-of-tsushima-directors-cut-po-seti.html").then((result) => {
             console.log(result);
         });
     }, []);

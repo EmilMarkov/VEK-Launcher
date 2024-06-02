@@ -9,13 +9,13 @@ mod app_modules;
 use app_modules::database::Database;
 use app_modules::torrent_service::TorrentService;
 use app_modules::provider_xatab::ProviderXatab;
-use crate::app_modules::provider_0xempress::Provider0xEMPRESS;
-use crate::app_modules::provider_dodi::ProviderDODI;
-use crate::app_modules::provider_fitgirl::ProviderFitGirl;
-use crate::app_modules::provider_gog::ProviderGOG;
-use crate::app_modules::provider_kaoskrew::ProviderKaOsKrew;
-use crate::app_modules::provider_onlinefix::ProviderOnlineFix;
-use crate::app_modules::provider_tinyrepacks::ProviderTinyRepacks;
+use crate::app_modules::provider_0xempress::{Provider0xEMPRESS, get_torrent_info_0xempress};
+use crate::app_modules::provider_dodi::{ProviderDODI, get_torrent_info_dodi};
+use crate::app_modules::provider_fitgirl::{ProviderFitGirl, get_torrent_info_fitgirl};
+use crate::app_modules::provider_gog::{ProviderGOG, get_torrent_info_gog};
+use crate::app_modules::provider_kaoskrew::{ProviderKaOsKrew, get_torrent_info_kaoskrew};
+use crate::app_modules::provider_onlinefix::{ProviderOnlineFix, get_torrent_info_onlinefix};
+use crate::app_modules::provider_tinyrepacks::{ProviderTinyRepacks, get_torrent_info_tinyrepacks};
 use crate::app_modules::helpers::{get_database_path, is_database_old};
 
 #[tauri::command]
@@ -81,7 +81,14 @@ async fn main() -> Result<(), Box<dyn Error>> {
             close_splashscreen,
             fetch_web_content,
             fetch_file_buffer,
-            update_status
+            update_status,
+            get_torrent_info_0xempress,
+            get_torrent_info_dodi,
+            get_torrent_info_fitgirl,
+            get_torrent_info_gog,
+            get_torrent_info_kaoskrew,
+            get_torrent_info_onlinefix,
+            get_torrent_info_tinyrepacks
         ])
         .setup(|app| {
             let window = app.get_window("main").unwrap();
@@ -93,7 +100,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 if is_database_old(&db_path, six_hours) {
                     let db = Arc::new(Mutex::new(Database::new().unwrap()));
                     let torrent_service = Arc::new(Mutex::new(TorrentService::new(db.clone())));
-
+    
                     let mut provider_xatab = ProviderXatab::new(torrent_service.clone());
                     let mut provider_fitgirl = ProviderFitGirl::new(torrent_service.clone());
                     let mut provider_dodi = ProviderDODI::new(torrent_service.clone());
@@ -102,18 +109,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
                     let mut provider_tinyrepacks = ProviderTinyRepacks::new(torrent_service.clone());
                     let mut provider_gog = ProviderGOG::new(torrent_service.clone());
                     let mut provider_onlinefix = ProviderOnlineFix::new(torrent_service.clone());
-
+    
                     provider_onlinefix.authenticate().await.unwrap();
-
-                    match provider_onlinefix.get_torrent_info("https://online-fix.me/games/adventures/17512-spanky-po-seti.html").await {
-                        Ok((updated, magnet)) => {
-                            println!("Дата обновления: {}", updated);
-                            println!("Magnet ссылка: {}", magnet);
-                        },
-                        Err(e) => {
-                            println!("Ошибка: {}", e);
-                        }
-                    }
 
                     update_status(window.clone(), "Инициализация Xatab".into()).await;
                     provider_xatab.init_scraping().await.unwrap();
