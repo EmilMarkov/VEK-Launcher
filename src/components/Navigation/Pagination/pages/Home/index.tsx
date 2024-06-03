@@ -3,6 +3,9 @@ import { gameService } from '@services/gameService/gameService';
 import { Container, CardsContainer, NavigationButtons } from './styles';
 import GameCard from '@/components/UIElements/games/GameCard';
 import { listen } from '@tauri-apps/api/event';
+import { ChevronRight } from "lucide-react"
+import { ChevronLeft } from "lucide-react"
+import { Button } from "@/components/shadcn-ui/ui/button"
 
 const HomePage: React.FC = () => {
     const [games, setGames] = useState([]);
@@ -71,12 +74,18 @@ const HomePage: React.FC = () => {
                 {gameCards}
             </CardsContainer>
             <NavigationButtons>
-                <button onClick={() => prevPage && fetchGames(undefined, prevPage)} disabled={!prevPage}>
-                    Previous
-                </button>
-                <button onClick={() => nextPage && fetchGames(undefined, nextPage)} disabled={!nextPage}>
-                    Next
-                </button>
+                <Button onClick={() => prevPage && fetchGames(undefined, prevPage)}
+                        disabled={!prevPage}
+                        variant="outline"
+                        size="icon">
+                    <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button onClick={() => nextPage && fetchGames(undefined, nextPage)}
+                        disabled={!nextPage}
+                        variant="outline"
+                        size="icon">
+                    <ChevronRight className="h-4 w-4" />
+                </Button>
             </NavigationButtons>
         </Container>
     );

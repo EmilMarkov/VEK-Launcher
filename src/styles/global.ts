@@ -251,8 +251,8 @@ export default createGlobalStyle`
         flex-wrap: nowrap;
         overflow-y: auto;
         overflow-x: auto;
-        background-color: ${props => props.theme.colors.background_5};
-        border: 2px solid ${props => props.theme.colors.background_5};
+        background-color: ${props => props.theme.colors.background};
+        border: 2px solid ${props => props.theme.colors.background};
         border-radius: 8px;
         padding: 8px;
     }
@@ -294,31 +294,23 @@ export default createGlobalStyle`
         width: 7px;
         height: 8px;
         background: transparent;
+        border-radius: 4px;
+        background-color: ${props => props.theme.colors.background};
     }
 
     /* Track */
     ::-webkit-scrollbar-track {
-        background: ${props => props.theme.colors.background};
+        background-color: ${props => props.theme.colors.background_2};
         border-radius: 5px;
         margin-left: 10px;
         margin-right: 10px;
-        margin-top: 5px;
-        margin-bottom: 5px;
     }
-
     /* Handle */
     ::-webkit-scrollbar-thumb {
-        background: ${props => shade(0.3, props.theme.colors.accentColor)};
+        background-color: ${props => props.theme.colors.background_6};
         border-radius: 4px;
     }
 
-    /* Handle on hover */
-    ::-webkit-scrollbar-thumb:hover {
-        background: ${props => props.theme.colors.accentColor};
-    }
-    ::-webkit-scrollbar-thumb:active {
-        background: ${props => props.theme.colors.appColorGreen};
-    }
     ::-webkit-scrollbar-corner { 
         background: transparent;
     }

@@ -3,13 +3,13 @@ import styled from 'styled-components';
 export const Card = styled.div`
     display: flex;
     flex-direction: column;
-    justify-content: flex-end; // Выравнивание содержимого к низу
-    position: relative; // Для позиционирования элементов внутри карточки
+    justify-content: flex-end;
+    position: relative;
     width: 240px;
     height: 200px;
     border-radius: 8px;
     overflow: hidden;
-    background-size: cover; // Фоновое изображение на всю карточку
+    background-size: cover;
     background-position: center;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     transition: transform 0.1s ease;
@@ -22,19 +22,19 @@ export const Card = styled.div`
 
 export const CardOverlay = styled.div`
     width: 100%;
-    padding: 10px; // Уменьшенные отступы
-    background-color: rgba(0, 0, 0, 0.5); // Полупрозрачный черный фон
-    color: #fff; // Белый цвет текста
+    padding: 10px;
+    background-color: ${props => props.theme.colors.background_6};
+    color: #fff;
 `;
 
 export const CardTitle = styled.h3`
     font-size: 16px;
-    margin: 0; // Убраны отступы вокруг заголовка
+    margin: 0;
 `;
 
 export const CardRating = styled.div`
     font-size: 14px;
-    margin: 5px 0 0; // Отступ только сверху
+    margin: 5px 0 0;
 `;
 
 export const Image = styled.img<{ isLoaded: boolean }>`

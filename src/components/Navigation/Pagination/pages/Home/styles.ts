@@ -12,7 +12,9 @@ export const Container = styled.div<Props>`
     justify-content: flex-start;
     user-select: none;
     width: 100%;
-    padding: 20px;
+    padding: 10px;
+    background-color: ${props => props.theme.colors.background_4};
+    border-radius: 10px;
     box-sizing: border-box;
     overflow: hidden;
 `;
@@ -37,26 +39,26 @@ export const CardsContainer = styled.div`
 export const NavigationButtons = styled.div`
     display: flex;
     justify-content: center;
-    margin-top: 20px;
+    margin-top: 10px;
     width: 100%;
 
     button {
-        padding: 10px 20px;
+        padding: 5px 10px;
         margin: 0 10px;
         font-size: 16px;
-        background-color: #007BFF;
+        background-color: ${props => props.theme.colors.background_6};
         color: white;
         border: none;
         border-radius: 5px;
         cursor: pointer;
 
         &:disabled {
-            background-color: #ccc;
+            background-color: ${props => props.theme.colors.background_5};
             cursor: default;
         }
 
         &:not(:disabled):hover {
-            background-color: #0056b3;
+            background-color: ${props => props.theme.colors.background_5};
         }
     }
 `;

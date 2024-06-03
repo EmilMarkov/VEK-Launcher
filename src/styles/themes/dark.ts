@@ -5,53 +5,56 @@ export default {
 
     colors: {
         // Default Colors
-        primary: '#1B1D23',
-        secundary: '#98C379',
-        accentColor: '#62AEEF',
-        accentColor_dark: shade(0.1, '#62AEEF'),
+        primary: '#131418',  // Очень тёмный серо-чёрный
+        secundary: '#98C379',  // Используем яркий акцент для контраста
+        accentColor: '#334455',  // Тёмно-синий, почти чёрный
+        accentColor_dark: shade(0.1, '#334455'),
         transparent: 'transparent',
         // Background Levels
-        background: '#161B21',
-        background_1: '#1A1F25',
-        background_2: '#1E2329',
-        background_3: '#22272D',
-        background_4: '#262B31',
-        background_5: '#2A2F35',
-        background_6: '#2E3339',
-        background_modal: 'rgba(22, 27, 33, 0.5)',
+        background: '#1A1C1F',
+        background_1: '#181A1D',
+        background_2: '#16181B',
+        background_3: '#141619',
+        background_4: '#121417',
+        background_5: '#101215',
+        background_6: '#0D0F12',
+        background_modal: 'rgba(13, 15, 18, 0.9)',  // Почти чёрный с небольшой прозрачностью
         // Buttons Colors
-        buttonColor: '#161B21',
-        buttonBgColor: shade(0.35, '#62AEEF'),
-        buttonBgHover: shade(0, '#62AEEF'),
-        buttonBgPressed: '#98C379',
+        buttonColor: '#0D0F12',  // Очень тёмный чёрный
+        buttonBgColor: shade(0.35, '#334455'),  // Тёмный синий
+        buttonBgHover: shade(0, '#334455'),  // Тёмный синий без изменения
+        buttonBgPressed: '#98C379',  // Сохраняем зелёный для акцента
         // Input Colors
-        inputColor: '#B1B7C3',
+        inputColor: '#B1B7C3',  // Светлый серый для контраста
         inputColorFocus: '#B1B7C3',
-        inputBgColor: '#1B1D23',
-        inputBgHover: '#1E2027',
-        inputBgFocus: '#1B1D23',
-        inputBorder: '#1B1D23',
-        inputErrorBg: '#1E2027',
-        inputErrorBorder: '#E06B74',
-        inputCorrectBorder: '#98C379',
+        inputBgColor: '#0D0F12',  // Очень тёмный чёрный
+        inputBgHover: '#121417',  // Чуть светлее чёрного
+        inputBgFocus: '#0D0F12',
+        inputBorder: '#0D0F12',
+        inputErrorBg: '#1E2027',  // Тёмный серый
+        inputErrorBorder: '#E06B74',  // Яркий красный для ошибок
+        inputCorrectBorder: '#98C379',  // Зелёный
         // Link Colors
-        linkColor: shade(0.35, '#62AEEF'),
-        linkHover: shade(0, '#62AEEF'),
-        linkActive: '#E06B74',
+        linkColor: shade(0.35, '#334455'),  // Тёмно-синий
+        linkHover: shade(0, '#334455'),  // Тёмно-синий
+        linkActive: '#E06B74',  // Яркий красный
         // Text Colors
-        color: '#B1B7C3',
-        color_1: '#969DAB',
-        color_2: '#727B8C',
+        color: '#B1B7C3',  // Светлый серый для контраста
+        color_1: '#969DAB',  // Средне-серый
+        color_2: '#727B8C',  // Тёмно-серый
+        // Switch Colors
+        switchOn: "#0D0F12",
+        switchOff: "#c8d0d9",
         // App Colors
-        appColorGreen: '#98C379',
-        appColorRed: '#E06B74',
-        appColorYellow: '#E5C07B',
-        appColorOrange: '#D48100',
-        appColorPink: '#ff008c',
-        appColorPink_1: '#C678DD',
-        appBorderColor: '#282C33',
+        appColorGreen: '#98C379',  // Зелёный
+        appColorRed: '#E06B74',  // Красный
+        appColorYellow: '#E5C07B',  // Жёлтый
+        appColorOrange: '#D48100',  // Оранжевый
+        appColorPink: '#ff008c',  // Яркий розовый
+        appColorPink_1: '#C678DD',  // Лиловый
+        appBorderColor: '#121417',  // Тёмно-чёрный
         // Icon Color
-        appIconColor: '#B1B7C3',
+        appIconColor: '#B1B7C3',  // Светлый серый
     },
 
     settings: {

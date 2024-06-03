@@ -38,6 +38,7 @@ export const Button = styled.button<Props>`
     }
     &:hover {
         transition: 0.5s;
+        cursor: pointer;
         background-color: ${props => props.colorHover};
     }
     & svg {

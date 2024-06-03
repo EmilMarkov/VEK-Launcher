@@ -2,7 +2,6 @@ import React, { useContext } from 'react'
 import Switch from 'react-switch'
 import { ThemeContext } from 'styled-components'
 import { Props, Content } from './styles'
-import { shade } from 'polished'
 import IconRoundedButton from '@components/UIElements/Buttons/IconRoundedButton'
 import { appWindow } from '@tauri-apps/api/window'
 import { type } from '@tauri-apps/api/os';
@@ -111,8 +110,8 @@ const Header: React.FC<Props> = ({
                 size='30px'
                 svgIcon={svgIconNotification}
                 colorDefault={theme.colors.buttonColor}
-                colorHover={theme.title === 'dark' ? theme.colors.accentColor : shade(0.6, theme.colors.buttonBgHover)}
-                colorPressed={theme.colors.appColorYellow}
+                colorHover={theme.colors.buttonBgHover}
+                colorPressed={theme.colors.buttonBgPressed}
                 highlightIcon={true}
                 radius='8px'
               />
@@ -126,8 +125,8 @@ const Header: React.FC<Props> = ({
                   width={30}
                   height={16}
                   handleDiameter={12}
-                  offColor={shade(0.6, theme.colors.accentColor)}
-                  onColor={theme.colors.accentColor}
+                  offColor={theme.colors.switchOff}
+                  onColor={theme.colors.switchOn}
                 />
               </div>
               
