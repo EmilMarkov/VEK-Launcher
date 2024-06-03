@@ -1,14 +1,26 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, {useState, useEffect, useMemo, useRef} from 'react';
 import { gameService } from '@services/gameService/gameService';
 import { Container, CardsContainer, NavigationButtons } from './styles';
 import GameCard from '@/components/UIElements/games/GameCard';
+import { listen } from '@tauri-apps/api/event';
 
 const HomePage: React.FC = () => {
     const [games, setGames] = useState([]);
     const [loading, setLoading] = useState(true);
     const [nextPage, setNextPage] = useState<string | null>(null);
     const [prevPage, setPrevPage] = useState<string | null>(null);
+    const apiKeyUpdated = useRef(false);
     const [cache, setCache] = useState<{ [key: string]: any }>({});
+
+    useEffect(() => {
+        const unlisten = listen('api_key_updated', () => {
+            apiKeyUpdated.current = true;
+        });
+
+        return () => {
+            unlisten.then(f => f());
+        };
+    }, []);
 
     const fetchGames = async (page?: number, next?: string) => {
         setLoading(true);
@@ -28,7 +40,6 @@ const HomePage: React.FC = () => {
                 setNextPage(data.next);
                 setPrevPage(data.previous);
                 setLoading(false);
-                console.log("Загрузка");
             } catch (error) {
                 console.error('Failed to fetch games:', error);
                 setLoading(false);
@@ -37,8 +48,10 @@ const HomePage: React.FC = () => {
     };
 
     useEffect(() => {
-        fetchGames(1);
-    }, []);
+        if (apiKeyUpdated) {
+            fetchGames(1);
+        }
+    }, [apiKeyUpdated.current]);
 
     const gameCards = useMemo(
         () => games.map(game => (

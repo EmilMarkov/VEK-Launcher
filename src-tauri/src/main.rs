@@ -58,7 +58,15 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 let db_path = get_database_path().unwrap();
                 let six_hours = Duration::from_secs(6 * 60 * 60);
 
-                update_api_key().await.unwrap();
+                match update_api_key().await {
+                    Ok(_) => {
+                        window.emit("api_key_updated", {}).unwrap();
+                    }
+                    Err(e) => {
+                        eprintln!("Failed to update API key: {}", e);
+                        return;
+                    }
+                }
 
                 if is_database_old(&db_path, six_hours) {
                     let db = Arc::new(Mutex::new(Database::new().unwrap()));

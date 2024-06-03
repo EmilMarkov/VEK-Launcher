@@ -69,7 +69,6 @@ async fn get(url: &str, retry: bool) -> Result<Value, Box<dyn Error>> {
         },
         StatusCode::UNAUTHORIZED => {
             if retry {
-                update_api_key().await?;
                 let new_user_agent = get_rua();
                 let new_client = Client::builder()
                     .user_agent(new_user_agent)
