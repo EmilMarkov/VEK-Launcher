@@ -28,6 +28,11 @@
         "transparent": true,
         "url": "../src/pages/index.html"
       }      
-    ]
+    ],
+    "updater": {
+      "windows": {
+        "installMode": "passive"
+      }
+    }
   }
 }

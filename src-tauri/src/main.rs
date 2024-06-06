@@ -52,33 +52,9 @@ async fn get_all_torrents() -> Result<Vec<Torrent>, String> {
     torrent_service.get_all_torrents().await
 }
 
-async fn check_and_apply_updates(window: Window) -> Result<(), String> {
-    match tauri::api::http::Updater::check_now().await {
-        Ok(update) => {
-            if update.should_update() {
-                update_status(window.clone(), format!("Обновление до версии {}", update.version())).await;
-                match update.update().await {
-                    Ok(_) => update_status(window.clone(), "Обновление завершено. Перезагрузка...".into()).await,
-                    Err(e) => {
-                        eprintln!("Ошибка при обновлении: {}", e);
-                        update_status(window.clone(), "Ошибка обновления".into()).await;
-                        return Err("Failed to apply update".into());
-                    }
-                }
-            }
-        },
-        Err(e) => {
-            eprintln!("Ошибка проверки обновлений: {}", e);
-            update_status(window.clone(), "Ошибка проверки обновлений".into()).await;
-            return Err("Failed to check for updates".into());
-        }
-    }
-    Ok(())
-}
-
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    tauri::Builder::default()
+    let app = tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             close_splashscreen,
             update_status,
@@ -99,16 +75,13 @@ async fn main() -> Result<(), Box<dyn Error>> {
         ])
         .setup(|app| {
             let window = app.get_window("main").unwrap();
+            let splashscreen = app.get_window("splashscreen").unwrap();
 
             tokio::spawn(async move {
-                if let Err(e) = check_and_apply_updates(window.clone()).await {
-                    eprintln!("Ошибка при обновлении: {}", e);
-                }
-
-                update_status(window.clone(), "Обновление ключей".into()).await;
+                update_status(splashscreen.clone(), "Обновление ключей".into()).await;
                 match update_api_key().await {
                     Ok(api_key) => {
-                        window.emit("api_key_updated", api_key).unwrap();
+                        splashscreen.emit("api_key_updated", api_key).unwrap();
                     }
                     Err(e) => {
                         eprintln!("Failed to update API key: {}", e);
@@ -130,28 +103,28 @@ async fn main() -> Result<(), Box<dyn Error>> {
                     let mut provider_gog = ProviderGOG::new(torrent_service.clone());
                     let mut provider_onlinefix = ProviderOnlineFix::new(torrent_service.clone());
 
-                    update_status(window.clone(), "Инициализация Xatab".into()).await;
+                    update_status(splashscreen.clone(), "Инициализация Xatab".into()).await;
                     provider_xatab.init_scraping().await.unwrap();
 
-                    update_status(window.clone(), "Инициализация FitGirl".into()).await;
+                    update_status(splashscreen.clone(), "Инициализация FitGirl".into()).await;
                     provider_fitgirl.init_scraping().await.unwrap();
 
-                    update_status(window.clone(), "Инициализация DODI".into()).await;
+                    update_status(splashscreen.clone(), "Инициализация DODI".into()).await;
                     provider_dodi.init_scraping().await.unwrap();
 
-                    update_status(window.clone(), "Инициализация 0xEMPRESS".into()).await;
+                    update_status(splashscreen.clone(), "Инициализация 0xEMPRESS".into()).await;
                     provider_0xempress.init_scraping().await.unwrap();
 
-                    update_status(window.clone(), "Инициализация KaOsKrew".into()).await;
+                    update_status(splashscreen.clone(), "Инициализация KaOsKrew".into()).await;
                     provider_kaoskrew.init_scraping().await.unwrap();
 
-                    update_status(window.clone(), "Инициализация TinyRepacks".into()).await;
+                    update_status(splashscreen.clone(), "Инициализация TinyRepacks".into()).await;
                     provider_tinyrepacks.init_scraping().await.unwrap();
 
-                    update_status(window.clone(), "Инициализация GOG".into()).await;
+                    update_status(splashscreen.clone(), "Инициализация GOG".into()).await;
                     provider_gog.init_scraping().await.unwrap();
 
-                    update_status(window.clone(), "Инициализация Online-Fix".into()).await;
+                    update_status(splashscreen.clone(), "Инициализация Online-Fix".into()).await;
                     provider_onlinefix.init_scraping().await.unwrap();
                 }
 
@@ -160,8 +133,38 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
             Ok(())
         })
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .build(tauri::generate_context!())?;
+
+    app.run(|app_handle, event| match event {
+        tauri::RunEvent::Updater(updater_event) => {
+            match updater_event {
+                tauri::UpdaterEvent::UpdateAvailable { body, date, version } => {
+                    app_handle.emit_all("update_status", format!("Доступно обновление: {} {:?}", version, date)).unwrap();
+                }
+                tauri::UpdaterEvent::Pending => {
+                    app_handle.emit_all("update_status", "Обновление скоро начнется!".to_string()).unwrap();
+                }
+                tauri::UpdaterEvent::DownloadProgress { chunk_length, content_length } => {
+                    app_handle.emit_all("update_status", format!("Загружено {} из {:?}", chunk_length, content_length)).unwrap();
+                }
+                tauri::UpdaterEvent::Downloaded => {
+                    app_handle.emit_all("update_status", "Обновление загружено!").unwrap();
+                    tauri::api::process::restart(&app_handle.env());
+                }
+                tauri::UpdaterEvent::Updated => {
+                    app_handle.emit_all("update_status", "Приложение обновлено!").unwrap();
+                }
+                tauri::UpdaterEvent::AlreadyUpToDate => {
+                    app_handle.emit_all("update_status", "Приложение уже обновлено.").unwrap();
+                }
+                tauri::UpdaterEvent::Error(error) => {
+                    app_handle.emit_all("update_status", format!("Ошибка при обновлении: {}", error)).unwrap();
+                }
+                _ => (),
+            }
+        }
+        _ => {}
+    });
 
     Ok(())
 }

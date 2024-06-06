@@ -53,7 +53,8 @@
       "endpoints": [
         "https://api.github.com/repos/EmilMarkov/VEK-Launcher/releases/latest"
       ],
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEZGRUZENkE3MTdGNzQwNTEKUldSUlFQY1hwOWJ2LzF2TGlqLzc4d0lFT3ovYWhYQ0pEcGdCYk0vajcrU0xNb0pxK1FEOEV3d1MK"
+      "dialog": true,
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IHJzaWduIGVuY3J5cHRlZCBzZWNyZXQga2V5ClJXUlRZMEl5eXk1NXA1ZmpWb2tTbXlzTDdhWXdLV2NtMDlRWjQ1MitGK3hqMUNpTm1rQUFBQkFBQUFBQUFBQUFBQUlBQUFBQW91UldIR2pLaUxMRFFzNXZha0poaCtiUnJRQnE2UXhKVjdFV0dCa000djE4N1JaMHZOUzJrdFVnSEoxMWZxUHdSd3RnMUI0eVc0ZWZwOWw3clVpM2FVWm0xWDZtcEp2K1JCaFFpNUhwYnBtNjByM0w0b2pqS1RmYUgzNUFjUStWSzQ0WERzbmM5T1E9Cg==%"
     }
   }
 }
