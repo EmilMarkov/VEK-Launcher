@@ -1,14 +1,9 @@
-import TorrentParserWorker from './torrent-parser.worker.js?worker';
-import {ITorrent} from "@/types";
-import { Semaphore } from 'async-mutex';
+import {Torrent} from "@/types";
 import Fuse from "fuse.js";
 import * as databaseService from "@services/databaseService";
 
-const MAX_WORKERS = 11;
-const semaphore = new Semaphore(MAX_WORKERS);
-
 class TorrentService {
-  private fuse: Fuse<ITorrent> | null = null;
+  private fuse: Fuse<Torrent> | null = null;
 
   private async initializeFuse() {
     const torrents = await this.getAllTorrents();
@@ -18,70 +13,20 @@ class TorrentService {
     });
   }
 
-  private async addTorrent(torrent: ITorrent): Promise<void> {
+  private async addTorrent(torrent: Torrent): Promise<void> {
     await databaseService.addTorrent(torrent);
     await this.initializeFuse();
   }
 
-  public async addTorrentByBuffer(buffer: Uint8Array, name: string, repacker: string, updated: string): Promise<void> {
-    const [value, release] = await semaphore.acquire();
-    return new Promise((resolve, reject) => {
-      const worker = new TorrentParserWorker();
-
-      worker.onmessage = ({ data }) => {
-        if (data != "") {
-          const torrent: ITorrent = {
-            id: "",
-            name: name,
-            repacker: repacker,
-            updated: updated,
-            torrent: data
-          }
-
-          this.addTorrent(torrent)
-              .then(resolve)
-              .catch(reject)
-              .finally(release);
-        } else {
-          console.error('Failed to parse torrent file', data.error);
-          release();
-        }
-      };
-
-      worker.onerror = (error) => {
-        console.error('Worker error:', error);
-        release();
-      };
-
-      worker.postMessage(buffer);
-    });
-  }
-
-  public async addTorrentByLink(name: string, repacker: string, updated: string, link: string): Promise<void> {
-    try {
-      const torrent: ITorrent = {
-        id: "",
-        name: name,
-        repacker: repacker,
-        updated: updated,
-        torrent: link
-      }
-
-      await this.addTorrent(torrent);
-    } catch (error) {
-      console.error('Error adding torrent:', error);
-    }
-  }
-
-  public async getTorrentById(id: string): Promise<ITorrent | null> {
+  public async getTorrentById(id: string): Promise<Torrent | null> {
     return await databaseService.getTorrentById(id);
   }
 
-  public async getAllTorrents(): Promise<ITorrent[]> {
+  public async getAllTorrents(): Promise<Torrent[]> {
     return await databaseService.getAllTorrents();
   }
 
-  public async getTorrentsByName(name: string): Promise<ITorrent[]> {
+  public async getTorrentsByName(name: string): Promise<Torrent[]> {
     if (!this.fuse) {
       await this.initializeFuse();
     }
@@ -90,10 +35,10 @@ class TorrentService {
     return results.map(result => result.item);
   }
 
-  public async updateTorrentById(torrent: ITorrent): Promise<void> {
+  public async updateTorrentById(torrent: Torrent): Promise<void> {
     await databaseService.updateTorrent(torrent);
     await this.initializeFuse();
   }
 }
 
-export default TorrentService;
+export const torrentService = new TorrentService();

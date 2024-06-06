@@ -9,6 +9,7 @@ import { appWindow } from '@tauri-apps/api/window';
 import { type } from '@tauri-apps/api/os';
 import light from '@styles/themes/light';
 import { BarLoader } from 'react-spinners';
+import {invoke} from "@tauri-apps/api";
 
 const osType = await type();
 
@@ -17,12 +18,10 @@ function SplashScreen() {
     const [status, setStatus] = useState<string>('Загрузка...');
 
     useEffect(() => {
-        // Listen for status updates
         const unlisten = listen<string>('update_status', (event) => {
             setStatus(event.payload);
         });
 
-        // Clean up listener on unmount
         return () => {
             unlisten.then(f => f());
         };

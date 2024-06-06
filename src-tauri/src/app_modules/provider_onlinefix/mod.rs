@@ -312,5 +312,8 @@ pub async fn get_torrent_info_onlinefix(url: String, window: Window) -> Result<(
     let provider = ProviderOnlineFix::new(torrent_service);
     provider.authenticate().await.unwrap();
 
-    provider.get_torrent_info(&url).await
+    match provider.get_torrent_info(&url).await {
+        Ok(info) => Ok(info),
+        Err(e) => Err(e),
+    }
 }

@@ -1,29 +1,30 @@
 import React, { useContext } from 'react';
 import Modal from 'react-modal';
 import { Props } from './styles';
-import IconRoundedButton from '@components/UIElements/Buttons/IconRoundedButton';
+import styled from 'styled-components';
 import { ThemeContext } from 'styled-components'
-
-import {
-    SvgIconClose
-} from '@components/UIElements/Icons/SvgIcon'
+import { X } from 'lucide-react';
 
 import {
     modelStyles,
     Header
 } from './styles'
+import GameModal from './pages/Game';
+import { Button } from '@/components/shadcn-ui/ui/button';
+import SearchModal from './pages/Search';
 
 Modal.setAppElement('#root');
 
-const Modals: React.FC<Props> = ({ setModal, closeModal, data }) => {
+const Modals: React.FC<Props> = ({ setModal, closeModal, modalName, data }) => {
     const theme = useContext(ThemeContext)
-    const svgIconClose = <SvgIconClose size='22px' />
 
     var modal = null;
     switch (setModal) {
-        case 'name':
-            const a = data;
-            //modal = <NameModal data={data} />;
+        case 'game':
+            modal = <GameModal data={data}/>;
+            break;
+        case 'search':
+            modal = <SearchModal data={data}/>;
             break;
         default:
             modal = null;
@@ -37,18 +38,14 @@ const Modals: React.FC<Props> = ({ setModal, closeModal, data }) => {
                 onRequestClose={closeModal}
             >
                 <Header>
-                    <p>Archive</p>
-                    <IconRoundedButton
+                    <p>{modalName}</p>
+                    <StyledButton
+                        className='h-8 w-8 border-r-2'
                         onClick={() => { closeModal() }}
-                        title='Close'
-                        size='24px'
-                        svgIcon={svgIconClose}
-                        colorDefault={theme.colors.buttonColor}
-                        colorHover={theme.colors.buttonBgHover}
-                        colorPressed={theme.colors.buttonBgPressed}
-                        highlightIcon={true}
-                        radius='8px'
-                    />
+                        variant="outline"
+                        size="icon">
+                        <StyledX className="h-4 w-4" />
+                    </StyledButton>
                 </Header>
                 {modal}
             </Modal>
@@ -57,3 +54,25 @@ const Modals: React.FC<Props> = ({ setModal, closeModal, data }) => {
 };
 
 export default Modals;
+
+const StyledButton = styled(Button)`
+    background-color: ${props => props.theme.colors.background_6};
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+
+    &:disabled {
+        background-color: #ccc;
+        cursor: default;
+    }
+
+    &:not(:disabled):hover {
+        background-color: ${props => props.theme.colors.background_5};
+    }
+`;
+
+const StyledX = styled(X)`
+    color: ${props => props.theme.colors.color_1};
+`;

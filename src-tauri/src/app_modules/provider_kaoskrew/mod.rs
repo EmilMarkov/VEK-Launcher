@@ -194,5 +194,8 @@ pub async fn get_torrent_info_kaoskrew(url: String, window: Window) -> Result<(S
     let torrent_service = Arc::new(Mutex::new(TorrentService::new(db.clone())));
     
     let provider = ProviderKaOsKrew::new(torrent_service);
-    provider.get_torrent_info(&url).await
+    match provider.get_torrent_info(&url).await {
+        Ok(info) => Ok(info),
+        Err(e) => Err(e),
+    }
 }

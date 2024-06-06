@@ -216,5 +216,8 @@ pub async fn get_torrent_info_xatab(url: String, window: Window) -> Result<(Stri
     let torrent_service = Arc::new(Mutex::new(TorrentService::new(db.clone())));
     
     let provider = ProviderXatab::new(torrent_service);
-    provider.get_torrent_info(&url).await
+    match provider.get_torrent_info(&url).await {
+        Ok(info) => Ok(info),
+        Err(e) => Err(e),
+    }
 }

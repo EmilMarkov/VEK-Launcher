@@ -3,7 +3,8 @@ import styled, { DefaultTheme } from 'styled-components';
 export interface Props {
   setModal?: string | null;
   closeModal: () => void;
-  data: string;
+  modalName: string;
+  data: any;
 }
 
 export const modelStyles = (theme: DefaultTheme | undefined) => {
@@ -32,9 +33,9 @@ export const Header = styled.div`
     display: flex;
     justify-content: space-between;
     font-size: 16px;
-    height: 28px;
+    height: 40px;
     align-items: center;
-    background-color: ${props => props.theme.colors.background_4};
+    background-color: ${props => props.theme.colors.background_6};
     border-radius: 6px;
     padding: 0 10px;
   }

@@ -35,10 +35,10 @@ export const Content = styled.header<Props>`
         align-items: center;
         flex: 1;
         height: 34px;
+        font-size: 16px;
         line-height: 34px;
         gap: 6px;
         padding-left: 6px;
-        padding-top: 4px;
         margin-right: 10px;
         overflow: hidden;
     }
@@ -56,6 +56,7 @@ export const Content = styled.header<Props>`
         align-items: center;
         gap: 5px;
         padding-right: 2px;
+        width: calc(100% - 218px);
     }
     & .title-bar .buttons .switch {
         display: flex;
@@ -82,6 +83,7 @@ export const Content = styled.header<Props>`
         line-height: 22px;
         color: ${props => props.theme.colors.color_2};
         padding-left: 10px;
+        margin-left: 5px;
         padding-right: 10px;
         font-size: 0.8em;
         line-height: 22px;
@@ -91,5 +93,6 @@ export const Content = styled.header<Props>`
     & .info-bar span {
         white-space: nowrap;
         overflow: hidden;
+        font-size: 14px;
     }
 `

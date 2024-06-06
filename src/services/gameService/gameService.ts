@@ -1,45 +1,47 @@
+import { GameSearchResults } from '@/types';
+import usePersistedState from '@/utils/userPersistedState';
 import { invoke } from '@tauri-apps/api/tauri';
 
 class GameService {
-    async getGameList(page?: number, next?: string): Promise<any> {
+    async getGameList(api_key: string, page?: number, next?: string): Promise<any> {
         try {
-            return await invoke('get_game_list', { page, next });
+            return await invoke('get_game_list', { apiKey: api_key, page, next });
         } catch (error) {
             console.error('Error fetching game list:', error);
             throw error;
         }
     }
 
-    async searchGame(query: string, next?: string): Promise<any> {
+    async searchGame(api_key: string, query: string, next?: string): Promise<GameSearchResults> {
         try {
-            return await invoke('search_game', { query, next });
+            return await invoke('search_game', { apiKey: api_key, query, next });
         } catch (error) {
             console.error('Error searching game:', error);
             throw error;
         }
     }
 
-    async getGameDetail(id: number): Promise<any> {
+    async getGameDetail(api_key: string, id: number): Promise<any> {
         try {
-            return await invoke('get_game_detail', { id });
+            return await invoke('get_game_details', { apiKey: api_key, id });
         } catch (error) {
             console.error('Error fetching game detail:', error);
             throw error;
         }
     }
 
-    async getGameScreenshots(id: number, page?: number, next?: string): Promise<any> {
+    async getGameScreenshots(api_key: string, id: number, page?: number, next?: string): Promise<any> {
         try {
-            return await invoke('get_game_screenshots', { id, page, next });
+            return await invoke('get_game_screenshots', { apiKey: api_key, id, page, next });
         } catch (error) {
             console.error('Error fetching game screenshots:', error);
             throw error;
         }
     }
 
-    async getGameMovies(id: number, next?: string): Promise<any> {
+    async getGameMovies(api_key: string, id: number, next?: string): Promise<any> {
         try {
-            return await invoke('get_game_movies', { id, next });
+            return await invoke('get_game_movies', { apiKey: api_key, id, next });
         } catch (error) {
             console.error('Error fetching game movies:', error);
             throw error;

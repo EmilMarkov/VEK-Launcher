@@ -2,16 +2,9 @@ use reqwest;
 use serde_json::Value;
 use std::error::Error;
 use std::fmt;
-use lazy_static::lazy_static;
 use regex::Regex;
-use std::sync::Mutex;
 use fake_user_agent::get_rua;
 use reqwest::{Client, StatusCode};
-use reqwest::header::{HeaderValue};
-
-lazy_static! {
-    static ref API_KEY: Mutex<String> = Mutex::new(String::new());
-}
 
 const BASE_URL: &str = "https://api.rawg.io/api/";
 const PAGE_SIZE: usize = 10;
@@ -95,7 +88,7 @@ async fn get(url: &str, retry: bool) -> Result<Value, Box<dyn Error>> {
     }
 }
 
-pub async fn update_api_key() -> Result<(), Box<dyn Error>> {
+pub async fn update_api_key() -> Result<String, Box<dyn Error>> {
     let url = "https://rawg.io/";
     let resp = reqwest::get(url).await?;
     let body = resp.text().await?;
@@ -103,9 +96,7 @@ pub async fn update_api_key() -> Result<(), Box<dyn Error>> {
     let re = Regex::new(r#""rawgApiKey":"([a-zA-Z0-9]+)""#)?;
     if let Some(caps) = re.captures(&body) {
         if let Some(api_key) = caps.get(1) {
-            let mut key = API_KEY.lock().unwrap();
-            *key = api_key.as_str().to_string();
-            return Ok(());
+            return Ok(api_key.as_str().to_string());
         }
     }
 
@@ -113,8 +104,7 @@ pub async fn update_api_key() -> Result<(), Box<dyn Error>> {
 }
 
 #[tauri::command]
-pub async fn get_game_list(page: Option<usize>, next: Option<&str>) -> Result<Option<Value>, String> {
-    let api_key = API_KEY.lock().unwrap().clone();
+pub async fn get_game_list(api_key: &str, page: Option<usize>, next: Option<&str>) -> Result<Option<Value>, String> {
     let url = if let Some(next_url) = next {
         next_url.to_string()
     } else {
@@ -129,14 +119,13 @@ pub async fn get_game_list(page: Option<usize>, next: Option<&str>) -> Result<Op
 }
 
 #[tauri::command]
-pub async fn search_game(query: &str, next: Option<&str>) -> Result<Option<Value>, String> {
-    let api_key = API_KEY.lock().unwrap().clone();
+pub async fn search_game(api_key: &str, query: &str, next: Option<&str>) -> Result<Option<Value>, String> {
     let url = if let Some(next_url) = next {
         next_url.to_string()
     } else {
         format!(
-            "{}games?search={}&key={}&play_on_desktop={}",
-            BASE_URL, query, api_key, PLAY_ON_DESKTOP
+            "{}games?platforms=4&exclude_additions=true&exclude_stores=true&exclude_collection=true&search_exact=true&search={}&key={}&ordering=-rating",
+            BASE_URL, query, api_key
         )
     };
 
@@ -145,8 +134,7 @@ pub async fn search_game(query: &str, next: Option<&str>) -> Result<Option<Value
 }
 
 #[tauri::command]
-pub async fn get_game_detail(id: i32) -> Result<Option<Value>, String> {
-    let api_key = API_KEY.lock().unwrap().clone();
+pub async fn get_game_details(api_key: &str, id: i32) -> Result<Option<Value>, String> {
     let url = format!("{}games/{}?key={}", BASE_URL, id, api_key);
 
     let response = get(&url, true).await.map_err(|e| e.to_string())?;
@@ -154,8 +142,7 @@ pub async fn get_game_detail(id: i32) -> Result<Option<Value>, String> {
 }
 
 #[tauri::command]
-pub async fn get_game_screenshots(id: i32, page: Option<usize>, next: Option<&str>) -> Result<Option<Value>, String> {
-    let api_key = API_KEY.lock().unwrap().clone();
+pub async fn get_game_screenshots(api_key: &str, id: i32, page: Option<usize>, next: Option<&str>) -> Result<Option<Value>, String> {
     let url = if let Some(next_url) = next {
         next_url.to_string()
     } else {
@@ -170,8 +157,7 @@ pub async fn get_game_screenshots(id: i32, page: Option<usize>, next: Option<&st
 }
 
 #[tauri::command]
-pub async fn get_game_movies(id: i32, next: Option<&str>) -> Result<Option<Value>, String> {
-    let api_key = API_KEY.lock().unwrap().clone();
+pub async fn get_game_movies(api_key: &str, id: i32, next: Option<&str>) -> Result<Option<Value>, String> {
     let url = if let Some(next_url) = next {
         next_url.to_string()
     } else {

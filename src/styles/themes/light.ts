@@ -54,7 +54,7 @@ export default {
         appColorPink_1: '#d63031', // Темно-розовый
         appBorderColor: '#bdc3c7', // Светло-серый
         // Icon Color
-        appIconColor: '#2c3e50', // Тёмный синий
+        appIconColor: '#B1B7C3', // Тёмный синий
     },
 
     settings: {

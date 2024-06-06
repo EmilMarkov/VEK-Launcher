@@ -11,7 +11,7 @@ export class Settings {
     /** Default app name */
     static appName: string = 'VEK Launcher'
     /** Default version */
-    static appVersion: string = 'v0.0.1'
+    static appVersion: string = 'v0.0.2'
     /** Choose the application's default theme before it is modified by the user */
     static appDefaultTheme: any = dark
     /** Choose your app's home page when running */

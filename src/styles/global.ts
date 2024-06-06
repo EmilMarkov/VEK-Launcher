@@ -295,19 +295,19 @@ export default createGlobalStyle`
         height: 8px;
         background: transparent;
         border-radius: 4px;
-        background-color: ${props => props.theme.colors.background};
+        background-color: ${props => props.theme.colors.background_6};
     }
 
     /* Track */
     ::-webkit-scrollbar-track {
-        background-color: ${props => props.theme.colors.background_2};
+        background-color: ${props => props.theme.colors.background_6};
         border-radius: 5px;
         margin-left: 10px;
         margin-right: 10px;
     }
     /* Handle */
     ::-webkit-scrollbar-thumb {
-        background-color: ${props => props.theme.colors.background_6};
+        background-color: ${props => props.theme.colors.background};
         border-radius: 4px;
     }
 
