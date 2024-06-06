@@ -1,10 +1,9 @@
 // Import Assets
 import Logo from '@assets/app_logo.png'
-import LogoDark from '@assets/app_logo_dark.png'
-import { SvgIconLogo } from '@components/UIElements/Icons/SvgIcon'
 
 // Default Theme
 import dark from '@styles/themes/dark'
+import {TorrentUpdateEnum} from "@/types";
 
 // App Settings
 export class Settings {
@@ -12,7 +11,7 @@ export class Settings {
     /** Default app name */
     static appName: string = 'VEK Launcher'
     /** Default version */
-    static appVersion: string = 'v0.0.1'
+    static appVersion: string = 'v0.0.2'
     /** Choose the application's default theme before it is modified by the user */
     static appDefaultTheme: any = dark
     /** Choose your app's home page when running */
@@ -25,14 +24,8 @@ export class Settings {
     static appDeveloperEmail: string = 'mail@markov-emil.ru'
     /** Add a logo to your application, PNG or SVG. */
     static appLogo: string = Logo
-    /** Add a dark logo to your application, PNG or SVG. */
-    static appLogoDark: string = LogoDark
-    /** Set logo size based on height */
-    static appLogoHeight: string = '32'
-    /** Set title bar icon size */
-    static appTitleBarIconSize: string = '16'
-    /** Add a title bar icon */
-    static appTitleBarIcon: any = <SvgIconLogo size={this.appTitleBarIconSize}/>
+    /** How often to update the torrent list*/
+    static torrentUpdateFrequency: TorrentUpdateEnum = TorrentUpdateEnum.EVERYDAY
 
     // Left Menu
     /** Left menu toggle button icon size */

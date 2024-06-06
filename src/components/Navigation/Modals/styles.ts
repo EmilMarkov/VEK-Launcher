@@ -3,12 +3,14 @@ import styled, { DefaultTheme } from 'styled-components';
 export interface Props {
   setModal?: string | null;
   closeModal: () => void;
+  modalName: string;
+  data: any;
 }
 
-export const modelStyles = (theme: DefaultTheme) => {
+export const modelStyles = (theme: DefaultTheme | undefined) => {
   return {
     overlay: {
-      backgroundColor: theme.colors.background_modal,
+      backgroundColor: theme?.colors.background_modal,
     },
     content: {
       padding: '10px',
@@ -18,9 +20,9 @@ export const modelStyles = (theme: DefaultTheme) => {
       gap: '10px',
       flex: '1',
       flexBasis: '100px',
-      border: '4px solid ' + theme.colors.background_4,
+      border: '4px solid ' + theme?.colors.background_4,
       borderRadius: '10px',
-      backgroundColor: theme.colors.background,
+      backgroundColor: theme?.colors.background,
       overflow: 'hidden',
     },
   };
@@ -31,9 +33,9 @@ export const Header = styled.div`
     display: flex;
     justify-content: space-between;
     font-size: 16px;
-    height: 28px;
+    height: 40px;
     align-items: center;
-    background-color: ${props => props.theme.colors.background_4};
+    background-color: ${props => props.theme.colors.background_6};
     border-radius: 6px;
     padding: 0 10px;
   }

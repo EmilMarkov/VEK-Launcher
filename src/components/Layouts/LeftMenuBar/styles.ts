@@ -23,7 +23,9 @@ export const Content = styled.aside<Props>`
         min-width: ${props => props.width ? props.width : '56px'};
         height: 100%;
         overflow: hidden;
-        background-color: ${props => props.theme.colors.background};
+        margin: 5px;
+        border-radius: 10px;
+        background-color: ${props => props.theme.colors.background_3};
         transition: 0.5s;
         transition-timing-function: ease-in-out;
         transition-property: width;
@@ -33,7 +35,7 @@ export const Content = styled.aside<Props>`
         flex: 1;
         display: flex;
         flex-direction: column;
-        padding: 10px;
+        padding: 8px;
         overflow: hidden;
     }
     /* Nav Menu */

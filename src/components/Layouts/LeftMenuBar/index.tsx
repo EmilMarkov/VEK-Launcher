@@ -1,5 +1,4 @@
-import React, { useContext, useRef, useState } from 'react'
-import { ThemeContext } from 'styled-components'
+import React, { useRef } from 'react'
 import { Content, Props } from './styles'
 import { 
     SvgIconHome,
@@ -8,7 +7,6 @@ import {
     SvgIconSettings,
     SvgIconInfo,
 } from '@components/UIElements/Icons/SvgIcon'
-import { Settings } from '@/Settings'
 
 const LeftMenuBar: React.FC<Props> = ({
     setPageName,
@@ -25,14 +23,11 @@ const LeftMenuBar: React.FC<Props> = ({
     const svgIconAbout    = <SvgIconInfo size={buttonsIconSize ? buttonsIconSize : '24'} />
 
     const menu = useRef<HTMLElement>(null)
-    const logoImg = useRef<HTMLImageElement>(null)
-
-    const theme = useContext(ThemeContext)
 
     function changePage(event: any){
         
         var page = event.target.getAttribute('page-name')
-        var isActivated = event.target.getAttribute('is-ctivated')
+        var isActivated = event.target.getAttribute('is-activated')
 
         if(menu.current && isActivated === 'true') {
             var btns = menu.current.querySelectorAll('a')
@@ -61,19 +56,19 @@ const LeftMenuBar: React.FC<Props> = ({
             <nav  className='nav-menus'>
                 <ul className='flex-1'>
                     <li>
-                        <a className={defaultPage == 'about' ? 'menu-active' : ''}  is-ctivated='true' href="#" onClick={changePage} title='Home' page-name='home'>
+                        <a className={defaultPage == 'home' ? 'menu-active' : ''} is-activated='true' href="#" onClick={changePage} title='Home' page-name='home'>
                             {svgIconHome}
                             <span>Home</span>
                         </a> 
                     </li>
                     <li>
-                        <a className={defaultPage == 'about' ? 'menu-active' : ''} href="#" onClick={changePage} is-ctivated='true' title='Catalog' page-name='catalog'>
+                        <a className={defaultPage == 'catalog' ? 'menu-active' : ''} is-activated='true' href="#" onClick={changePage} title='Catalog' page-name='catalog'>
                             {svgIconCatalog}
                             <span>Catalog</span>
                         </a>
                     </li>
                     <li>
-                        <a className={defaultPage == 'about' ? 'menu-active' : ''} href="#" onClick={changePage} is-ctivated='true' title='Library' page-name='library'>
+                        <a className={defaultPage == 'library' ? 'menu-active' : ''} is-activated='true' href="#" onClick={changePage} title='Library' page-name='library'>
                             {svgIconLibrary}
                             <span>Library</span>
                         </a>
@@ -81,13 +76,13 @@ const LeftMenuBar: React.FC<Props> = ({
                 </ul>
                 <ul className='bottom-menus'>
                     <li>
-                        <a className={defaultPage == 'about' ? 'menu-active' : ''} href="#" onClick={changePage} is-ctivated='true' title='Settings' page-name='settings'>
+                        <a className={defaultPage == 'settings' ? 'menu-active' : ''} is-activated='true' href="#" onClick={changePage} title='Settings' page-name='settings'>
                             {svgIconSettings}
                             <span>Settings</span>
                         </a>
                     </li>
                     <li>
-                        <a className={defaultPage == 'about' ? 'menu-active' : ''} href="#" onClick={changePage} is-ctivated='true' title='About' page-name='about'>
+                        <a className={defaultPage == 'about' ? 'menu-active' : ''} is-activated='true' href="#" onClick={changePage} title='About' page-name='about'>
                             {svgIconAbout}
                             <span>About</span>
                         </a>

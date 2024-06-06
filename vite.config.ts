@@ -1,10 +1,20 @@
 import { defineConfig, UserConfigExport } from 'vite'
 import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
+import reactWorker from "vite-plugin-react-worker";
+import tailwindcss from 'tailwindcss'
 
 const config: UserConfigExport = async () => {
   return {
-    plugins: [react()],
+    plugins: [
+      react(),
+      reactWorker(),
+    ],
+    css: {
+      postcss: {
+        plugins: [tailwindcss()],
+      },
+    },
     clearScreen: false,
     server: {
       port: 1420,

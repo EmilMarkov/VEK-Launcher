@@ -2,20 +2,12 @@ import React from 'react'
 import { Container, Props } from './styles'
 import { Settings } from '@/Settings'
 
-import { SvgIconLogo } from '@components/UIElements/Icons/SvgIcon'
-import store from '@/store'
-
 const AboutPage: React.FC<Props> = ({pageName, visible})=>{
-    const svgIconLogo = <SvgIconLogo size='120px' />
-
-    console.log(store.getState())
-
     return(
         <Container className={`app-container-column ${visible ? "" : "hide-page"}`}>            
             <section className="app-section flex-1">
                 <div className="content box-time flex-column">
                     <div className='column app-image'>
-                        {svgIconLogo}
                         <div className='app-name'>{Settings.appName}</div>
                     </div>
                     <div className='row app-info-box'>
@@ -36,7 +28,7 @@ const AboutPage: React.FC<Props> = ({pageName, visible})=>{
                     </div>
                     <div className='row app-info-box'>
                         <div className='left'>framework:</div>
-                        <div className='right'>Tauri 1.4 with React</div>
+                        <div className='right'>Tauri 1.6 with React</div>
                     </div>
                     <div className='row app-info-box'>
                         <div className='left'>languages:</div>

@@ -43,6 +43,9 @@ declare module 'styled-components' {
             color: string,
             color_1: string,
             color_2: string,
+            // Switch Colors
+            switchOn: string,
+            switchOff: string,
             // App Colors
             appColorGreen: string,
             appColorRed: string,

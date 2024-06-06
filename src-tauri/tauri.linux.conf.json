@@ -3,8 +3,8 @@
     "windows": [
       {
         "title": "Loading...",
-        "width": 280,
-        "height": 280,
+        "width": 560,
+        "height": 315,
         "decorations": false,
         "transparent": true,
         "url": "../src/pages/splashscreen.html",

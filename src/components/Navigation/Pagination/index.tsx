@@ -8,7 +8,6 @@ import LibraryPage from './pages/Library'
 
 const Pagination: React.FC<Props> = ({setPage})=>{
 
-    // Set pages using switch
     var page = null
     switch(setPage){
         case 'home':

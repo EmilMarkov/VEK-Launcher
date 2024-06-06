@@ -14,6 +14,7 @@ import light from '@styles/themes/light'
 import { type } from '@tauri-apps/api/os';
 const osType = await type()
 
+
 // Set DropShadow
 if (osType == "Windows_NT") invoke('set_window_shadow')
 
@@ -26,12 +27,10 @@ function App() {
   const [appName, setAppName] = useState(Settings.appName)
   const [pageName, setPageName] = useState(Settings.appDefaultPage)
   const [focus, setFocus] = useState<boolean>(true)
-  const [appLeftMenuLogo, setAppLeftMenuLogo] = useState(Settings.appLogo)
 
   useEffect(() => {
     setMaximized()
     updateAppName()
-    changeLogo()
   }, [
     isAppMaximized,
     appName,
@@ -75,12 +74,6 @@ function App() {
       theme == 'dark' ? setTheme(dark) : setTheme(light)
     })
   })
-  // Change logo when change theme and load
-  function changeLogo() {
-    theme.title == dark.title ?
-      setAppLeftMenuLogo(Settings.appLogo) :
-      setAppLeftMenuLogo(Settings.appLogoDark)
-  }
 
   // Prevent context menu and shortcuts
   function disable_web_functions() {
@@ -128,7 +121,6 @@ function App() {
         {/* Header */}
         <Header
           isAppMaximized={isAppMaximized}
-          titleBarIcon={Settings.appTitleBarIcon}
           setTheme={setTheme}
           appName={appName}
           leftInformation={Settings.appTitleBarDescription}
@@ -139,7 +131,6 @@ function App() {
         <div className='column'>
           {/* Left Menu */}
           <LeftMenuBar
-            appLogo={appLeftMenuLogo}
             setPageName={setPageName}
             width={Settings.leftMenuWidth}
             iconLeftPadding={Settings.leftMenuIconLeftPadding}

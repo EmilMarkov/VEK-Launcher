@@ -32,7 +32,7 @@ export default createGlobalStyle`
     // Set Abel font
     h1, h2, h3, input,
     .big-number,
-    .percentage {
+    .status {
         font-family: 'Abel', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji' !important;
     }
     // Set Hx size
@@ -102,11 +102,11 @@ export default createGlobalStyle`
     .preloader-app {
         display: flex;
         align-items: center;
-        align-content: center;
         justify-content: center;
-        width: 280px;
-        aspect-ratio: 1/1;
+        width: 100%;
+        height: 100vh;
         overflow: hidden;
+        padding: 5px;
     }
     .preloader-app .content {
         display: flex;
@@ -114,20 +114,30 @@ export default createGlobalStyle`
         flex-direction: column;
         justify-content: center;
         width: 80%;
-        aspect-ratio: 1/1;
-        border-radius: 50%;
+        border-radius: 20px;
         background-color: ${props => props.theme.colors.background}E6;
         filter: drop-shadow(0px 0px 6px rgb(0 0 0 / 0.3));
+        padding: 10px;
     }
-    .preloader-app .content .app-name{
+    .preloader-app .content .logo {
+        margin: 0;
+        padding: 5;
+    }
+    .preloader-app .content .app-name {
         font-weight: 500;
         color: ${props => props.theme.colors.color};
+        margin-top: 5px;
+        font-size: 2em;
     }
-    .preloader-app .content .percentage{
-        font-size: 4.5em;
+    .preloader-app .content .percentage {
+        font-size: 1.5em;
         font-weight: lighter;
     }
-    .preloader-app .content .version{
+    .preloader-app .content .loader-wrapper {
+        width: 90%;
+        margin: 5px 0;
+    }
+    .preloader-app .content .version {
         height: 20px;
         line-height: 20px;
         padding: 0 25px;
@@ -135,11 +145,9 @@ export default createGlobalStyle`
         font-size: 0.8em;
         color: ${props => props.theme.colors.color_2};
         background-color: ${props => props.theme.colors.background_4};
-    }
-    .preloader-app .content .loading-text{
         margin-top: 5px;
-        color: ${props => props.theme.colors.color_1};
     }
+
 
     /* Right Column */
     .right-column {
@@ -243,8 +251,8 @@ export default createGlobalStyle`
         flex-wrap: nowrap;
         overflow-y: auto;
         overflow-x: auto;
-        background-color: ${props => props.theme.colors.background_5};
-        border: 2px solid ${props => props.theme.colors.background_5};
+        background-color: ${props => props.theme.colors.background};
+        border: 2px solid ${props => props.theme.colors.background};
         border-radius: 8px;
         padding: 8px;
     }
@@ -286,31 +294,23 @@ export default createGlobalStyle`
         width: 7px;
         height: 8px;
         background: transparent;
+        border-radius: 4px;
+        background-color: ${props => props.theme.colors.background_6};
     }
 
     /* Track */
     ::-webkit-scrollbar-track {
-        background: ${props => props.theme.colors.background};
+        background-color: ${props => props.theme.colors.background_6};
         border-radius: 5px;
         margin-left: 10px;
         margin-right: 10px;
-        margin-top: 5px;
-        margin-bottom: 5px;
     }
-
     /* Handle */
     ::-webkit-scrollbar-thumb {
-        background: ${props => shade(0.3, props.theme.colors.accentColor)};
+        background-color: ${props => props.theme.colors.background};
         border-radius: 4px;
     }
 
-    /* Handle on hover */
-    ::-webkit-scrollbar-thumb:hover {
-        background: ${props => props.theme.colors.accentColor};
-    }
-    ::-webkit-scrollbar-thumb:active {
-        background: ${props => props.theme.colors.appColorGreen};
-    }
     ::-webkit-scrollbar-corner { 
         background: transparent;
     }
